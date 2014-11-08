@@ -1,0 +1,20 @@
+{
+	"name": "coDewife",
+	"description": "code formatter",
+	"authors": ["HaraldZealot", "krucios"],
+	"homepage": "https://github.com/ZuzuStudio/coDewife",
+	"copyright": "Copyright (c) 2014 Aliaksei Stankevich",
+	"configurations":[
+		{
+			"name": "library",
+			"targetType": "library",
+			"targetPath": "build/lib"
+		},
+		{
+			"name": "standalone",
+			"targetType": "executable",
+			"targetPath": "build/app",
+			"workingDirectory": "build/app"
+		}
+	]
+}
