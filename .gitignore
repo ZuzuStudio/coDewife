@@ -7,3 +7,5 @@
 bin/
 obj/
 .dub/
+build/
+dub.selections.json
