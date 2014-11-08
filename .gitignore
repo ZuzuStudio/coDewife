@@ -1,0 +1,9 @@
+*.exe
+*.obj
+*.so
+*.dll
+*.lib
+*.[oa]
+bin/
+obj/
+.dub/
