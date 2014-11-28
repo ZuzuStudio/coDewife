@@ -11,3 +11,5 @@ build/
 dub.selections.json
 *.userprefs
 *.lst
+*.dproj
+*.sln
