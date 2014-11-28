@@ -46,6 +46,7 @@ public:
 				internalModel ~= current.terminal ? passVersion : crashVersion;
 				passVersion=null;
 				crashVersion=null;
+				current=start;
 			}
 		}
 	}

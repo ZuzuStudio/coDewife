@@ -10,7 +10,7 @@ import
 
 void main()
 {
-	DigitLiteral steam_engine;
+	auto steam_engine = DigitLiteral(1);
 
 	auto line = readln();
 	steam_engine.parse(line);
@@ -24,7 +24,7 @@ void main()
 	{
 		write(term.outputCharSequence);
 	}
-	writeln("============================================");
+	writeln("\n============================================");
 	writeln("============= User Underscore ==============");
 	LogicalUnderscore.printable = false;
 	UserUnderscore.printable = true;
@@ -33,7 +33,7 @@ void main()
 	{
 		write(term.outputCharSequence);
 	}
-	writeln("============================================");
+	writeln("\n============================================");
 	writeln("============= Logical Underscore ===========");
 	LogicalUnderscore.printable = true;
 	UserUnderscore.printable = false;
@@ -42,7 +42,7 @@ void main()
 	{
 		write(term.outputCharSequence);
 	}
-	writeln("============================================");
+	writeln("\n============================================");
 	writeln("============= User Underscore ==============");
 	LogicalUnderscore.printable = false;
 	UserUnderscore.printable = false;
@@ -51,5 +51,5 @@ void main()
 	{
 		write(term.outputCharSequence);
 	}
-	writeln("============================================");
+	writeln("\n============================================");
 }
