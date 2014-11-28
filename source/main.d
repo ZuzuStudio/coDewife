@@ -22,7 +22,7 @@ void main()
 	CommonUnderscore.printable = false;
 	foreach(term; terms)
 	{
-		write(term.outputCharSequence);
+		writeln(term.outputCharSequence);
 	}
 	writeln("============================================");
 	writeln("============= User Underscore ==============");
@@ -31,7 +31,7 @@ void main()
 	CommonUnderscore.printable = true;
 	foreach(term; terms)
 	{
-		write(term.outputCharSequence);
+		writeln(term.outputCharSequence);
 	}
 	writeln("============================================");
 	writeln("============= Logical Underscore ===========");
@@ -40,7 +40,7 @@ void main()
 	CommonUnderscore.printable = true;
 	foreach(term; terms)
 	{
-		write(term.outputCharSequence);
+		writeln(term.outputCharSequence);
 	}
 	writeln("============================================");
 	writeln("============= User Underscore ==============");
@@ -49,7 +49,7 @@ void main()
 	CommonUnderscore.printable = true;
 	foreach(term; terms)
 	{
-		write(term.outputCharSequence);
+		writeln(term.outputCharSequence);
 	}
 	writeln("============================================");
 }
