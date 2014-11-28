@@ -10,7 +10,7 @@ public:
 
 	}
 
-	CommonUnderscore[] getInternalModel()const nothrow pure @safe
+	OutputTerm[] getInternalModel()const nothrow pure @safe
 	{
 
 	}
