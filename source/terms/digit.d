@@ -5,9 +5,9 @@ public import terms.common;
 unittest
 {
 	assert(isOutputTerm!Digit);
-	assert(!isOutputTerm!int);
 }
 
+// гэта пэўна не лічба а ўвогуле паслядоўнасць сімвалаў як ёсць
 struct Digit
 {
 public:
@@ -18,7 +18,7 @@ unittest
 	assert("9"==digit.outputCharSequence);
 }
 
-	@property string outputCharSequence()
+	string outputCharSequence()@property
 	{
 		return sequence;
 	}
