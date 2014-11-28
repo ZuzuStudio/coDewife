@@ -7,14 +7,14 @@ unittest
 	assert(isOutputTerm!UserUnderscore);
 }
 
-struct UserUnderscore
+class UserUnderscore: OutputTerm
 {
 public:
 	static bool printable;
 
 	unittest
 	{
-		UserUnderscore uu;
+		auto uu = new UserUnderscore;
 		UserUnderscore.printable = true;
 		assert("_" == uu.outputCharSequence);
 		UserUnderscore.printable = false;
@@ -23,6 +23,6 @@ public:
 
 	string outputCharSequence()@property
 	{
-		return printable?"_":"";
+		return printable ? "_" : "";
 	}
 }

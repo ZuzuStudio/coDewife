@@ -9,6 +9,11 @@ unittest
 
 template isOutputTerm(T)
 {
-	enum bool isOutputTerm = __traits(compiles,{T t; string str = t.outputCharSequence;});
+	enum bool isOutputTerm = is(T:OutputTerm);
+}
+
+interface OutputTerm
+{
+	string outputCharSequence()@property;
 }
 

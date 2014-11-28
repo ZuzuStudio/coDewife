@@ -4,24 +4,29 @@ public import terms.common;
 
 unittest
 {
-	assert(isOutputTerm!Digit);
+	assert(isOutputTerm!InvariantSequence);
 }
 
-// гэта пэўна не лічба а ўвогуле паслядоўнасць сімвалаў як ёсць
-struct Digit
+class InvariantSequence: OutputTerm
 {
 public:
 
-unittest
-{
-	auto digit = Digit("9");
-	assert("9"==digit.outputCharSequence);
-}
+	unittest
+	{
+		auto isq = new InvariantSequence("9");
+		assert("9" == isq.outputCharSequence);
+	}
+
+	this(string sequence)
+	{
+		this.sequence = sequence;
+	}
 
 	string outputCharSequence()@property
 	{
 		return sequence;
 	}
+
 private:
 	string sequence;
 }
