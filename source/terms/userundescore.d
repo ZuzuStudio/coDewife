@@ -7,7 +7,7 @@ unittest
 	assert(isOutputTerm!UserUnderscore);
 }
 
-class UserUnderscore: OutputTerm
+final class UserUnderscore: OutputTerm
 {
 public:
 	static bool printable;

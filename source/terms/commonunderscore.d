@@ -7,7 +7,7 @@ unittest
 	assert(isOutputTerm!CommonUnderscore);
 }
 
-class CommonUnderscore: OutputTerm
+final class CommonUnderscore: OutputTerm
 {
 public:
 	static bool printable;

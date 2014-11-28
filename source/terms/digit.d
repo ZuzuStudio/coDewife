@@ -7,7 +7,7 @@ unittest
 	assert(isOutputTerm!InvariantSequence);
 }
 
-class InvariantSequence: OutputTerm
+final class InvariantSequence: OutputTerm
 {
 public:
 
