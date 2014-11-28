@@ -9,3 +9,5 @@ obj/
 .dub/
 build/
 dub.selections.json
+*.userprefs
+*.lst
