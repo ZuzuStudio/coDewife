@@ -10,18 +10,25 @@ public:
 	{
 		start=new State(false);
 		start.addEdge(new StringEdge(["1","2","3","4","5","6","7","8","9"]));
-		auto one=new State(true);
+		auto one=new State(false);
 		start.links[0].target=one;
 		one.addEdge(new StringEdge(["0","1","2","3","4","5","6","7","8","9","_"]));
 		one.links[0].target=one;
 
 		start.addEdge(new StringEdge(["0"]));
-		auto two=new State(true);
+		auto two=new State(false);
 		start.links[1].target=two;
 
-		start.addEdge(new AllOtherEdge());
-		auto three=new State(true);
-		start.links[2].target=three;
+		one.addEdge(new StringEdge([" ", "\t","\n", "," , ".", ";", ":", "[", "]","{","}","(",")","!","?","/","\\","\"","'","&","*","+","-","^"]));
+		auto finish = new State(true);
+		one.links[1].target=finish;
+
+		two.addEdge(new StringEdge([" ", "\t","\n", "," , ".", ";", ":", "[", "]","{","}","(",")","!","?","/","\\","\"","'","&","*","+","-","^"]));
+		two.links[0].target=finish;
+
+		//start.addEdge(new AllOtherEdge());
+		//auto three=new State(true);
+		//start.links[2].target=three;
 
 		current = start;
 	}
@@ -30,6 +37,7 @@ public:
 	{
 		foreach(dchar symbol;text)
 		{
+			auto a=["zuzu":"kuku", ]; 
 			bool broken=true;
 			foreach(edge;current.links)
 			{
@@ -44,8 +52,11 @@ public:
 			if(broken)
 			{
 				internalModel ~= current.terminal ? passVersion : crashVersion;
+				internalModel ~= new InvariantSequence("#");
 				passVersion=null;
+				crashVersion=null;				crashVersion=null;
 				crashVersion=null;
+
 				current=start;
 			}
 		}
