@@ -55,7 +55,7 @@ void main()
 	CommonUnderscore.printable = true;
 	foreach(term; terms)
 	{
-		write(term.outputCharSequence);
+		writeln(term.outputCharSequence);
 	}
 	writeln("\n============================================");
 }
