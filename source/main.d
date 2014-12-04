@@ -10,11 +10,17 @@ import
 
 void main()
 {
-	auto steam_engine = DigitLiteral(1);
+	Engine[] steam_engine;
+	steam_engine~=new DigitLiteral;
+	steam_engine~=new SimpleReplace("#");
 
 	auto line = readln();
-	steam_engine.parse(line);
-	auto terms = steam_engine.getInternalModel();
+	OutputTerm[] terms;
+	do
+	{
+		terms ~= steam_engine[0].parse(line);
+		terms ~= steam_engine[1].parse(line);
+	}while(line.length);
 
 	writeln("============= No Underscore ================");
 	LogicalUnderscore.printable = false;
