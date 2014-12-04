@@ -19,11 +19,11 @@ public:
 		auto two=new State(false);
 		start.links[1].target=two;
 
-		one.addEdge(new StringEdge([" ", "\t","\n", "," , ".", ";", ":", "[", "]","{","}","(",")","!","?","/","\\","\"","'","&","*","+","-","^"]));
+		one.addEdge(new DelemiterEdge([" ", "\t","\n", "," , ".", ";", ":", "[", "]","{","}","(",")","!","?","/","\\","\"","'","&","*","+","-","^"]));
 		auto finish = new State(true);
 		one.links[1].target=finish;
 
-		two.addEdge(new StringEdge([" ", "\t","\n", "," , ".", ";", ":", "[", "]","{","}","(",")","!","?","/","\\","\"","'","&","*","+","-","^"]));
+		two.addEdge(new DelemiterEdge([" ", "\t","\n", "," , ".", ";", ":", "[", "]","{","}","(",")","!","?","/","\\","\"","'","&","*","+","-","^"]));
 		two.links[0].target=finish;
 
 		//start.addEdge(new AllOtherEdge());
@@ -37,7 +37,6 @@ public:
 	{
 		foreach(dchar symbol;text)
 		{
-			auto a=["zuzu":"kuku", ]; 
 			bool broken=true;
 			foreach(edge;current.links)
 			{
@@ -45,16 +44,16 @@ public:
 				{
 					current=edge.target;
 					broken=false;
-					passVersion ~= new InvariantSequence(to!string(symbol));
+					edge.concat(passVersion, crashVersion);
+					//passVersion ~= new InvariantSequence(to!string(symbol));
 					break;
 				}
 			}
-			if(broken)
+			if(current.terminal)
 			{
-				internalModel ~= current.terminal ? passVersion : crashVersion;
+				internalModel ~= !broken ? passVersion : crashVersion;
 				internalModel ~= new InvariantSequence("#");
 				passVersion=null;
-				crashVersion=null;				crashVersion=null;
 				crashVersion=null;
 
 				current=start;
@@ -89,6 +88,7 @@ private:
 	abstract class Edge
 	{
 		bool haveToGo(string key);
+		void concat(ref OutputTerm[] passVersion, ref OutputTerm[] crashVersion);
 		State target;
 	}
 
@@ -101,18 +101,58 @@ private:
 
 		override bool haveToGo(string key)
 		{
+			this.key = key;
 			return canFind(keys,key);
 		}	
 
+		override void concat(ref OutputTerm[] passVersion, ref OutputTerm[] crashVersion)
+		{
+			passVersion~=new InvariantSequence(key);
+			//crashVersion~=key;
+		}
+
 		string[] keys;
+		string key;
+	}
+
+	final class DelemiterEdge: Edge
+	{
+		this(string[] keys)
+		{
+			this.keys=keys;
+		}
+		
+		override bool haveToGo(string key)
+		{
+			this.key = key;
+			return canFind(keys,key);
+		}	
+
+		override void concat(ref OutputTerm[] passVersion,ref OutputTerm[] crashVersion)
+		{
+			passVersion~=new InvariantSequence("@");
+			//crashVersion~=key;
+		}
+		
+		string[] keys;
+		string key;
 	}
 
 	final class AllOtherEdge: Edge
 	{
 		override bool haveToGo(string key)
 		{
+			this.key=key;
 			return true;
 		}
+
+		override void concat(ref OutputTerm[] passVersion, ref OutputTerm[] crashVersion)
+		{
+			
+			//crashVersion~=key;
+		}
+
+		string key;
 	}
 
 
