@@ -1,6 +1,7 @@
 ﻿module terms.common;
 
 import std.traits;
+public import std.utf;
 
 unittest
 {

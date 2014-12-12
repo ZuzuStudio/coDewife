@@ -1,4 +1,4 @@
-﻿module terms.digit;
+﻿module terms.invariantsequence;
 
 public import terms.common;
 

@@ -3,7 +3,7 @@ module main;
 import  
 	std.stdio,
 	std.string,
-	fsm.digitliteral,
+	fsm.global,
 	terms.commonunderscore,
 	terms.logicalunderscore,
 	terms.userundescore;
