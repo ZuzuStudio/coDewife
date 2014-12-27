@@ -23,9 +23,10 @@ public:
 		size_t internalPosition = position;
 		OutputTerm[] internalOutput = null;
 		auto result = engine.parse(text, internalPosition, internalOutput);
+		if(result)
+			state = finish;
 		if(result && !quasi)
 		{
-			state = finish;
 			position = internalPosition;
 			output ~= internalOutput;pupublic:
 		}

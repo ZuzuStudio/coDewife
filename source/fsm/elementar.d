@@ -81,6 +81,42 @@ private:
 	bool functor(string symbol){return this.down <= symbol && symbol <= this.up;}
 }
 
+unittest
+{
+	Engine engine = new AllIdentity();
+	size_t position = 0;
+	OutputTerm[] output;
+	auto text = "12,3FЫ";
+	assert(engine.parse(text,position,output));
+	assert(position == 1);
+	assert(output[0].outputCharSequence == "1");
+	assert(engine.parse(text,position,output));
+	assert(position == 2);
+	assert(output[1].outputCharSequence == "2");
+	assert(engine.parse(text,position,output));
+	assert(position == 3);
+	assert(engine.parse(text,position,output));
+	assert(position == 4);
+	assert(engine.parse(text,position,output));
+	assert(position == 5);
+	assert(engine.parse(text,position,output));
+	assert(position == 7);
+	assert(!engine.parse(text,position,output));
+	assert(position == 7);
+	string result;
+	foreach(e;output)
+		result ~= e.outputCharSequence;
+	assert(result == text);
+}
+
+// MAYBE optimize
+final class AllIdentity: Engine
+{
+	mixin MixSimpleParse!(functor);
+private:
+	bool functor(string symbol){return true;}
+}
+
 private mixin template MixSimpleParse(alias predicate)
 {
 	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
@@ -100,8 +136,4 @@ private mixin template MixSimpleParse(alias predicate)
 }
 
 
-// TODO implement for any passing symbol
-/*final class AllIdentity: Engine
-{
 
-}*/
