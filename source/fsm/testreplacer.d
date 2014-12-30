@@ -1,6 +1,6 @@
 module testreplacer.d;
 
-class SimpleReplace: Engine
+/*class SimpleReplace: Engine
 {
 public:
 	this(string replace = null)
@@ -50,4 +50,4 @@ public:
 private:
 	State start, current;
 	string replace;
-}
+}*/

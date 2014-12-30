@@ -47,10 +47,10 @@ private:
 package final class State
 {
 public:
-	this(bool terminal, bool good)
+	this(bool terminal, bool quality)
 	{
 		this.terminal=terminal;
-		this.good = good;
+		this.quality = quality;
 	}
 
 	void addEdge(Edge edge, State target)
@@ -61,6 +61,6 @@ public:
 
 package:
 	bool terminal;
-	bool good;
+	bool quality;
 	Edge[] links;
 }

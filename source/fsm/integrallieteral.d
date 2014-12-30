@@ -6,7 +6,7 @@ import terms.userundescore, terms.commonunderscore, terms.logicalunderscore, ter
 import std.algorithm, std.conv;
 
 
-
+/+
 class DigitLiteral: Engine
 {
 public:
@@ -81,3 +81,4 @@ private:
 	State start, current;
 }
 
++/

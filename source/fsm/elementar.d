@@ -121,7 +121,7 @@ private mixin template MixSimpleParse(alias predicate)
 {
 	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
 	{
-		if(position>=text.length)
+		if(position >= text.length)
 			return false;
 		size_t index = position;
 		auto symbol = to!string(decode(text, index));
@@ -135,5 +135,11 @@ private mixin template MixSimpleParse(alias predicate)
 	}
 }
 
-
-
+final class EndOfText: Engine
+{
+public:
+	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
+	{
+		return position >= text.length;
+	}
+}
