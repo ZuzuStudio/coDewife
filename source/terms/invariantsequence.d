@@ -14,7 +14,7 @@ public:
 	unittest
 	{
 		auto isq = new InvariantSequence("9");
-		assert("9" == isq.outputCharSequence);
+		assert("9" == isq.charSequence);
 	}
 
 	this(string sequence)
@@ -22,7 +22,7 @@ public:
 		this.sequence = sequence;
 	}
 
-	string outputCharSequence()@property
+	string charSequence()@property
 	{
 		return sequence;
 	}

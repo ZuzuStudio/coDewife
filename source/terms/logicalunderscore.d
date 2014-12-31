@@ -16,12 +16,12 @@ public:
 	{
 		auto lu = new LogicalUnderscore;
 		LogicalUnderscore.printable = true;
-		assert("_" == lu.outputCharSequence);
+		assert("_" == lu.charSequence);
 		LogicalUnderscore.printable = false;
-		assert("" == lu.outputCharSequence);
+		assert("" == lu.charSequence);
 	}
 	
-	string outputCharSequence()@property
+	string charSequence()@property
 	{
 		return printable ? "_" : "";
 	}

@@ -15,6 +15,16 @@ template isOutputTerm(T)
 
 interface OutputTerm
 {
-	string outputCharSequence()@property;
+	string charSequence()@property;
 }
 
+version(unittest)
+{
+	string charSequence(OutputTerm[] terms)
+	{
+		typeof(return) result;
+		foreach(term; terms)
+			result ~= term.charSequence;
+		return result;
+	}
+}

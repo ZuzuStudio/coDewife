@@ -16,12 +16,12 @@ public:
 	{
 		auto cu = new CommonUnderscore;
 		CommonUnderscore.printable = true;
-		assert("_" == cu.outputCharSequence);
+		assert("_" == cu.charSequence);
 		CommonUnderscore.printable = false;
-		assert("" == cu.outputCharSequence);
+		assert("" == cu.charSequence);
 	}
 	
-	string outputCharSequence()@property
+	string charSequence()@property
 	{
 		return printable ? "_" : "";
 	}

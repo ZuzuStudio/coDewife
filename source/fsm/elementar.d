@@ -18,7 +18,7 @@ unittest
 	assert(engine.parse("a", position, output));
 	assert(position == 1);
 	assert(output);
-	assert(output[0].outputCharSequence == "a");
+	assert(output[0].charSequence == "a");
 }
 
 
@@ -51,17 +51,17 @@ unittest
 	assert(engine.parse("3", position, output));
 	assert(position == 1);
 	assert(output);
-	assert(output[0].outputCharSequence == "3");
+	assert(output[0].charSequence == "3");
 	position = 0;
 	assert(engine.parse("9", position, output));
 	assert(position == 1);
 	assert(output);
-	assert(output[1].outputCharSequence == "9");
+	assert(output[1].charSequence == "9");
 	position = 0;
 	assert(engine.parse("1", position, output));
 	assert(position == 1);
 	assert(output);
-	assert(output[2].outputCharSequence == "1");
+	assert(output[2].charSequence == "1");
 }
 
 final class RangeIdentity: Engine
@@ -89,10 +89,10 @@ unittest
 	auto text = "12,3FЫ";
 	assert(engine.parse(text,position,output));
 	assert(position == 1);
-	assert(output[0].outputCharSequence == "1");
+	assert(output[0].charSequence == "1");
 	assert(engine.parse(text,position,output));
 	assert(position == 2);
-	assert(output[1].outputCharSequence == "2");
+	assert(output[1].charSequence == "2");
 	assert(engine.parse(text,position,output));
 	assert(position == 3);
 	assert(engine.parse(text,position,output));
@@ -101,20 +101,25 @@ unittest
 	assert(position == 5);
 	assert(engine.parse(text,position,output));
 	assert(position == 7);
-	assert(!engine.parse(text,position,output));
+	assert(engine.parse(text,position,output));
 	assert(position == 7);
-	string result;
-	foreach(e;output)
-		result ~= e.outputCharSequence;
-	assert(result == text);
+	assert(output.charSequence == text);
 }
 
 // MAYBE optimize
 final class AllIdentity: Engine
 {
-	mixin MixSimpleParse!(functor);
-private:
-	bool functor(string symbol){return true;}
+public:
+	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
+	{
+		if(position >= text.length)
+			return true;
+		size_t index = position;
+		auto symbol = to!string(decode(text, index));
+		position = index;
+		output ~= new InvariantSequence(symbol);
+		return true;
+	}
 }
 
 private mixin template MixSimpleParse(alias predicate)
@@ -132,14 +137,5 @@ private mixin template MixSimpleParse(alias predicate)
 			output ~= new InvariantSequence(symbol);
 		}
 		return result;
-	}
-}
-
-final class EndOfText: Engine
-{
-public:
-	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
-	{
-		return position >= text.length;
 	}
 }

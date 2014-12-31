@@ -16,12 +16,12 @@ public:
 	{
 		auto uu = new UserUnderscore;
 		UserUnderscore.printable = true;
-		assert("_" == uu.outputCharSequence);
+		assert("_" == uu.charSequence);
 		UserUnderscore.printable = false;
-		assert("" == uu.outputCharSequence);
+		assert("" == uu.charSequence);
 	}
 
-	string outputCharSequence()@property
+	string charSequence()@property
 	{
 		return printable ? "_" : "";
 	}
