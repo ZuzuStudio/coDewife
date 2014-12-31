@@ -113,24 +113,7 @@ public:
 		current.addEdge(new Edge(new AllIdentity(), quasi), goodCrash);
 	}
 
-	bool parse(string text, ref size_t position, ref OutputTerm[] output)
-	{
-		auto current = start;
-		auto internalPosition = position;
-		OutputTerm[] internalOutput;
-		while(!current.terminal)
-		{
-			for(auto i=0;i < current.links.length && !current.links[i].parse(text, internalPosition, internalOutput, current);++i)
-			{
-			}
-		}
-		if(current.quality)
-		{
-			position = internalPosition;
-			output ~= internalOutput;
-		}
-		return current.quality;
-	}
+	mixin MixStandartParse!();
 
 private:
 	State start;
