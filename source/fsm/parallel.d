@@ -71,14 +71,16 @@ public:
 		enum good = true;
 		enum bad = false;
 		enum quasi = true;
-		start = new State(nonterminal, good);
+		
 		auto goodCrash = new State(terminal, good);
 		auto badCrash = new State(terminal, bad);
+		
+		start = new State(nonterminal, good);
+		auto goodState = new State(nonterminal, good);
+		goodState.addEdge(new Edge(new AllIdentity(), quasi), goodCrash);
 		foreach(engine; list)
 		{
-			auto newState = new State(nonterminal, good);
-			start.addEdge(new Edge(engine), newState);
-			newState.addEdge(new Edge(new AllIdentity(), quasi), goodCrash);
+			start.addEdge(new Edge(engine), goodState);
 		}
 		start.addEdge(new Edge(new AllIdentity(), quasi), badCrash);
 	}
