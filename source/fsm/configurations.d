@@ -8,9 +8,9 @@ unittest
 {
 	import std.traits;
 
-	static assert(__traits(compiles, {auto engine = new Sequence(new SingleIdentity("a"), new RangeIdentity("0","9"));}));
-	static assert(__traits(compiles, {auto engine = new Sequence("abc");}));
-	auto engine = new Sequence("abc");
+	static assert(__traits(compiles, {auto engine = makeSequence(new SingleIdentity("a"), new RangeIdentity("0","9"));}));
+	static assert(__traits(compiles, {auto engine = makeSequence("abc");}));
+	auto engine = makeSequence("abc");
 	size_t position;
 	OutputTerm[] output;
 	assert(engine.parse("abc",position,output));
@@ -43,7 +43,7 @@ unittest
 	assert(position == 3);
 	assert(output.charSequence == "abc");
 
-	engine = new Sequence(new SingleIdentity("a"), new RangeIdentity("0","9"));
+	engine = makeSequence(new SingleIdentity("a"), new RangeIdentity("0","9"));
 	position = 0;
 	output = null;
 	assert(engine.parse("a3",position,output));
@@ -76,45 +76,51 @@ unittest
 	assert(output is null);
 }
 
-final class Sequence: Engine
+final class Configurator: Engine
 {
 public:
-	this(string keyString)
-	{
-		Engine[] list;
-		foreach(dchar symbol; keyString)
-			list ~= new SingleIdentity(to!string(symbol));
-		this(list);
-	}
-
-	this(Engine[] list...)
-	{
-		this(list);
-	}
-
-	this(Engine[] list)
-	{
-		enum terminal = true;
-		enum nonterminal = false;
-		enum good = true;
-		enum bad = false;
-		enum quasi = true;
-		start = new State(nonterminal, good);
-		auto goodCrash = new State(terminal, good);
-		auto badCrash = new State(terminal, bad);
-		State current = start;
-		foreach(engine; list)
-		{
-			auto newState = new State(nonterminal, good);
-			current.addEdge(new Edge(engine), newState);
-			current.addEdge(new Edge(new AllIdentity(), quasi), badCrash);
-			current = newState;
-		}
-		current.addEdge(new Edge(new AllIdentity(), quasi), goodCrash);
-	}
-
 	mixin MixStandartParse!();
 
 private:
 	State start;
+
+	this()
+	{
+	}
+}
+
+Configurator makeSequence(string keyString)
+{
+	Engine[] list;
+	foreach(dchar symbol; keyString)
+		list ~= new SingleIdentity(to!string(symbol));
+	return makeSequence(list);
+}
+
+auto makeSequence(Engine[] list...)
+{
+	return makeSequence(list);
+}
+
+auto makeSequence(Engine[] list)
+{
+	enum terminal = true;
+	enum nonterminal = false;
+	enum good = true;
+	enum bad = false;
+	enum quasi = true;
+	auto result = new Configurator();
+	result.start = new State(nonterminal, good);
+	auto goodCrash = new State(terminal, good);
+	auto badCrash = new State(terminal, bad);
+	State current = result.start;
+	foreach(engine; list)
+	{
+		auto newState = new State(nonterminal, good);
+		current.addEdge(new Edge(engine), newState);
+		current.addEdge(new Edge(new AllIdentity(), quasi), badCrash);
+		current = newState;
+	}
+	current.addEdge(new Edge(new AllIdentity(), quasi), goodCrash);
+	return result;
 }
