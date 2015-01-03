@@ -50,7 +50,7 @@ public:
 		if(result && !quasi)
 		{
 			position = internalPosition;
-			output ~= internalOutput;pupublic:
+			output ~= internalOutput;
 		}
 		return result;
 	}

@@ -4,6 +4,19 @@ import std.conv;
 import fsm.common;
 import fsm.elementar;
 
+final class Configurator: Engine
+{
+public:
+	mixin MixStandartParse!();
+	
+private:
+	State start;
+	
+	this()
+	{
+	}
+}
+
 unittest
 {
 	import std.traits;
@@ -76,6 +89,42 @@ unittest
 	assert(output is null);
 }
 
+Configurator makeSequence(string keyString)
+{
+	Engine[] list;
+	foreach(dchar symbol; keyString)
+		list ~= new SingleIdentity(to!string(symbol));
+	return makeSequence(list);
+}
+
+auto makeSequence(Engine[] list...)
+{
+	return makeSequence(list);
+}
+
+auto makeSequence(Engine[] list)
+{
+	enum terminal = true;
+	enum nonterminal = false;
+	enum good = true;
+	enum bad = false;
+	enum quasi = true;
+	auto result = new Configurator();
+	result.start = new State(nonterminal, good);
+	auto goodCrash = new State(terminal, good);
+	auto badCrash = new State(terminal, bad);
+	State current = result.start;
+	foreach(engine; list)
+	{
+		auto newState = new State(nonterminal, good);
+		current.addEdge(new Edge(engine), newState);
+		current.addEdge(new Edge(new AllIdentity(), quasi), badCrash);
+		current = newState;
+	}
+	current.addEdge(new Edge(new AllIdentity(), quasi), goodCrash);
+	return result;
+}
+
 unittest
 {
 	import std.traits;
@@ -127,55 +176,6 @@ unittest
 	assert(output.charSequence == null);
 }
 
-final class Configurator: Engine
-{
-public:
-	mixin MixStandartParse!();
-
-private:
-	State start;
-
-	this()
-	{
-	}
-}
-
-Configurator makeSequence(string keyString)
-{
-	Engine[] list;
-	foreach(dchar symbol; keyString)
-		list ~= new SingleIdentity(to!string(symbol));
-	return makeSequence(list);
-}
-
-auto makeSequence(Engine[] list...)
-{
-	return makeSequence(list);
-}
-
-auto makeSequence(Engine[] list)
-{
-	enum terminal = true;
-	enum nonterminal = false;
-	enum good = true;
-	enum bad = false;
-	enum quasi = true;
-	auto result = new Configurator();
-	result.start = new State(nonterminal, good);
-	auto goodCrash = new State(terminal, good);
-	auto badCrash = new State(terminal, bad);
-	State current = result.start;
-	foreach(engine; list)
-	{
-		auto newState = new State(nonterminal, good);
-		current.addEdge(new Edge(engine), newState);
-		current.addEdge(new Edge(new AllIdentity(), quasi), badCrash);
-		current = newState;
-	}
-	current.addEdge(new Edge(new AllIdentity(), quasi), goodCrash);
-	return result;
-}
-
 Configurator makeParallel(Engine[] list...)
 {
 	return makeParallel(list);
@@ -200,5 +200,80 @@ auto makeParallel(Engine[] list)
 		current.addEdge(new Edge(engine), goodState);
 	}
 	current.addEdge(new Edge(new AllIdentity(), quasi), badCrash);
+	return result;
+}
+
+unittest
+{
+	import std.traits;
+	
+	static assert(__traits(compiles, {auto engine = makeCliniAsterisc(new SingleIdentity("a"));}));
+
+	auto engine = makeCliniAsterisc(new SingleIdentity("a"));
+
+	size_t position;
+	OutputTerm[] output;
+	assert(engine.parse("",position, output));
+	assert(position == 0);
+	assert(output.length == 0);// assert(output is null) fails :(
+
+	position = 0;
+	output = null;
+	assert(engine.parse("a", position, output));
+	assert(position == 1);
+	assert(output.charSequence == "a");
+
+	position = 0;
+	output = null;
+	assert(engine.parse("aa", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "aa");
+
+	position = 0;
+	output = null;
+	assert(engine.parse("aaa", position, output));
+	assert(position == 3);
+	assert(output.charSequence == "aaa");
+
+	position = 0;
+	output = null;
+	assert(engine.parse("aaa0", position, output));
+	assert(position == 3);
+	assert(output.charSequence == "aaa");
+
+	position = 0;
+	output = null;
+	assert(engine.parse("aaaabaa", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "aaaa");
+
+	position = 0;
+	output = null;
+	assert(engine.parse("aaaaaaa", position, output));
+	assert(position == 7);
+	assert(output.charSequence == "aaaaaaa");
+
+	position = 0;
+	output = null;
+	assert(engine.parse("baaaaaaa", position, output));
+	assert(position == 0);
+	assert(output.charSequence == "");
+}
+
+auto makeCliniAsterisc(Engine engine)
+{
+	enum terminal = true;
+	enum nonterminal = false;
+	enum good = true;
+	enum bad = false;
+	enum quasi = true;
+	auto result = new Configurator;
+	result.start = new State(nonterminal, good);
+	auto goodCrash = new State(terminal, good);
+	auto newState = new State(nonterminal, good);
+	result.start.addEdge(new Edge(engine), newState);
+	result.start.addEdge(new Edge(new AllIdentity, quasi), goodCrash);
+	newState.addEdge(new Edge(engine), newState);
+	newState.addEdge(new Edge(new AllIdentity, quasi), goodCrash);
 	return result;
 }
