@@ -138,3 +138,67 @@ private mixin template MixSimpleParse(alias predicate)
 		return result;
 	}
 }
+
+final class GeneralForward: Engine
+{
+public:
+	this(bool function(string) predicate , OutputTerm[] function(string) mapping)
+	{
+		this.predicate = predicate;
+		this.mapping = mapping;
+	}
+
+	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
+	{
+		if(position >= text.length)
+			return false;
+		size_t index = position;
+		auto symbol = to!string(decode(text, index));
+		auto result = predicate(symbol);
+		if(result)
+		{
+			position = index;
+			output ~= mapping(symbol);
+		}
+		return result;
+	}
+
+private:
+	bool function(string) predicate;
+	OutputTerm[] function(string) mapping;
+}
+
+final class GeneralBackward: Engine
+{
+public:
+	this(bool function(string) predicate , OutputTerm[] function(string) mapping)
+	{
+		this.predicate = predicate;
+		this.mapping = mapping;
+	}
+	
+	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
+	{
+		if(position < 0)
+			return false;
+		size_t index = position;
+		auto symbol = to!string(decodeReverse(text, index));
+		auto result = predicate(symbol);
+		if(result)
+		{
+			position = index;
+			output = mapping(symbol) ~ output;
+		}
+		return result;
+	}
+	
+private:
+	bool function(string) predicate;
+	OutputTerm[] function(string) mapping;
+}
+
+dchar decodeReverse(S)(auto ref S str, ref size_t index)
+{
+	// TODO rid out dummy
+	return cast(dchar)'\0';
+}
