@@ -106,7 +106,6 @@ unittest
 	assert(output.charSequence == text);
 }
 
-// MAYBE optimize
 final class AllIdentity: Engine
 {
 public:
