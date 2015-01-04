@@ -4,9 +4,7 @@ import
 	std.stdio,
 	std.string,
 	//fsm.global,
-	terms.commonunderscore,
-	terms.logicalunderscore,
-	terms.userundescore;
+	terms.underscore;
 
 void main()
 {

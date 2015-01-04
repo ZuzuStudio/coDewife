@@ -2,7 +2,7 @@
 
 
 import fsm.common;
-import terms.userundescore, terms.commonunderscore, terms.logicalunderscore, terms.invariantsequence;
+import terms.underscore, terms.invariantsequence;
 import std.algorithm, std.conv;
 
 
