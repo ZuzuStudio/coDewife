@@ -139,7 +139,37 @@ private mixin template MixSimpleParse(alias predicate)
 	}
 }
 
-final class GeneralForward: Engine
+unittest
+{
+	import terms.underscore;
+	auto engine = new General((string s) => s == "_", (string s) => cast(OutputTerm[])[] ~ new UserUnderscore);
+
+	size_t position;
+	OutputTerm[] output = [];
+	assert(engine.parse("_", position, output));
+	assert(position == 1);
+	UserUnderscore.printable = true;
+	assert(output.charSequence == "_");
+	UserUnderscore.printable = false;
+	assert(output.charSequence == "");
+
+	position = 0;
+	output = [];
+	assert(!engine.parse("-", position, output));
+	assert(position == 0);
+	assert(output !is []);
+}
+
+alias General = GeneralImplementation!(Direction.forward);
+
+unittest
+{
+
+}
+
+alias GeneralReverse = GeneralImplementation!(Direction.backward);
+
+final class GeneralImplementation(Direction direction): Engine
 {
 public:
 	this(bool function(string) predicate , OutputTerm[] function(string) mapping)
@@ -150,48 +180,30 @@ public:
 
 	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
 	{
-		if(position >= text.length)
-			return false;
+		static if(direction == Direction.forward)
+		{
+			if(position >= text.length)
+				return false;
+		}
+		else
+		{
+			if(position < 0)
+				return false;
+		}
 		size_t index = position;
 		auto symbol = to!string(decode(text, index));
 		auto result = predicate(symbol);
 		if(result)
 		{
 			position = index;
-			output ~= mapping(symbol);
+			static if(direction == Direction.forward)
+				output ~= mapping(symbol);
+			else
+				output = mapping(symbol) ~ output;
 		}
 		return result;
 	}
 
-private:
-	bool function(string) predicate;
-	OutputTerm[] function(string) mapping;
-}
-
-final class GeneralBackward: Engine
-{
-public:
-	this(bool function(string) predicate , OutputTerm[] function(string) mapping)
-	{
-		this.predicate = predicate;
-		this.mapping = mapping;
-	}
-	
-	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
-	{
-		if(position < 0)
-			return false;
-		size_t index = position;
-		auto symbol = to!string(decodeReverse(text, index));
-		auto result = predicate(symbol);
-		if(result)
-		{
-			position = index;
-			output = mapping(symbol) ~ output;
-		}
-		return result;
-	}
-	
 private:
 	bool function(string) predicate;
 	OutputTerm[] function(string) mapping;

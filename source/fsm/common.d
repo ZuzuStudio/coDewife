@@ -7,7 +7,9 @@ interface Engine
 	bool parse(string text, ref size_t position, ref OutputTerm[] output);
 }
 
-package mixin template MixStandartParse()
+enum Direction{forward, backward};
+
+package mixin template MixStandartParse(Direction direction = Direction.forward)
 {
 	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
 	{
@@ -23,13 +25,25 @@ package mixin template MixStandartParse()
 		if(current.quality)
 		{
 			position = internalPosition;
-			output ~= internalOutput;
+			static if(direction == Direction.forward)
+				output ~= internalOutput;
+			else
+				output = internalOutput ~ output;
 		}
 		return current.quality;
 	}
 }
 
-package final class Edge
+package interface EdgeInterface
+{
+	bool parse(string text, ref size_t position, ref OutputTerm[] output, ref State state);
+	void addFinish(State finish);
+}
+
+alias Edge = EdgeImplementation!(Direction.forward);
+alias ReverseEdge = EdgeImplementation!(Direction.backward);
+
+package final class EdgeImplementation(Direction direction):EdgeInterface
 {
 public:
 	this(Engine engine, bool quasi = false)
@@ -38,7 +52,7 @@ public:
 		this.quasi = quasi;
 	}
 
-	bool parse(string text, ref size_t position, ref OutputTerm[] output, ref State state)
+	override bool parse(string text, ref size_t position, ref OutputTerm[] output, ref State state)
 	{
 		assert(engine);
 		assert(finish);
@@ -50,12 +64,15 @@ public:
 		if(result && !quasi)
 		{
 			position = internalPosition;
-			output ~= internalOutput;
+			static if(direction == Direction.forward)
+				output ~= internalOutput;
+			else
+				output = internalOutput ~ output;
 		}
 		return result;
 	}
 
-	void addFinish(State finish)
+	override void addFinish(State finish)
 	{
 		this.finish = finish;
 	}
@@ -75,7 +92,7 @@ public:
 		this.quality = quality;
 	}
 
-	void addEdge(Edge edge, State target)
+	void addEdge(EdgeInterface edge, State target)
 	{
 		links~=edge;
 		links[$-1].addFinish(target);
@@ -84,5 +101,5 @@ public:
 package:
 	bool terminal;
 	bool quality;
-	Edge[] links;
+	EdgeInterface[] links;
 }

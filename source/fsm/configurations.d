@@ -4,10 +4,11 @@ import std.conv;
 import fsm.common;
 import fsm.elementar;
 
-final class Configurator: Engine
+// MAYBE private
+final class Configurator(Direction direction): Engine
 {
 public:
-	mixin MixStandartParse!();
+	mixin MixStandartParse!(direction);
 	
 private:
 	State start;
@@ -89,27 +90,27 @@ unittest
 	assert(output is null);
 }
 
-Configurator makeSequence(string keyString)
+Engine makeSequence(Direction direction = Direction.forward)(string keyString)
 {
 	Engine[] list;
 	foreach(dchar symbol; keyString)
 		list ~= new SingleIdentity(to!string(symbol));
-	return makeSequence(list);
+	return makeSequence!direction(list);
 }
 
-auto makeSequence(Engine[] list...)
+Engine makeSequence(Direction direction = Direction.forward)(Engine[] list...)
 {
-	return makeSequence(list);
+	return makeSequence!direction(list);
 }
 
-auto makeSequence(Engine[] list)
+Engine makeSequence(Direction direction = Direction.forward)(Engine[] list)
 {
 	enum terminal = true;
 	enum nonterminal = false;
 	enum good = true;
 	enum bad = false;
 	enum quasi = true;
-	auto result = new Configurator();
+	auto result = new Configurator!direction;
 	result.start = new State(nonterminal, good);
 	auto goodCrash = new State(terminal, good);
 	auto badCrash = new State(terminal, bad);
@@ -176,19 +177,19 @@ unittest
 	assert(output.charSequence == null);
 }
 
-Configurator makeParallel(Engine[] list...)
+Engine makeParallel(Direction direction = Direction.forward)(Engine[] list...)
 {
-	return makeParallel(list);
+	return makeParallel!direction(list);
 }
 
-auto makeParallel(Engine[] list)
+Engine makeParallel(Direction direction = Direction.forward)(Engine[] list)
 {
 	enum terminal = true;
 	enum nonterminal = false;
 	enum good = true;
 	enum bad = false;
 	enum quasi = true;
-	auto result = new Configurator();
+	auto result = new Configurator!direction;
 	result.start = new State(nonterminal, good);
 	auto goodCrash = new State(terminal, good);
 	auto badCrash = new State(terminal, bad);
@@ -260,14 +261,14 @@ unittest
 	assert(output.charSequence == "");
 }
 
-auto makeCliniAsterisc(Engine engine)
+Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
 {
 	enum terminal = true;
 	enum nonterminal = false;
 	enum good = true;
 	enum bad = false;
 	enum quasi = true;
-	auto result = new Configurator;
+	auto result = new Configurator!direction;
 	result.start = new State(nonterminal, good);
 	auto goodCrash = new State(terminal, good);
 	auto newState = new State(nonterminal, good);
