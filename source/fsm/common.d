@@ -15,7 +15,7 @@ package mixin template MixStandartParse(Direction direction = Direction.forward)
 	{
 		auto current = start;
 		auto internalPosition = position;
-		OutputTerm[] internalOutput;
+		OutputTerm[] internalOutput = [];
 		while(!current.terminal)
 		{
 			for(auto i=0;i < current.links.length && !current.links[i].parse(text, internalPosition, internalOutput, current);++i)
@@ -57,10 +57,11 @@ public:
 		assert(engine);
 		assert(finish);
 		size_t internalPosition = position;
-		OutputTerm[] internalOutput = null;
+		OutputTerm[] internalOutput = [];
 		auto result = engine.parse(text, internalPosition, internalOutput);
 		if(result)
 			state = finish;
+		output ~= [];
 		if(result && !quasi)
 		{
 			position = internalPosition;

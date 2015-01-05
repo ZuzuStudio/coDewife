@@ -157,7 +157,7 @@ unittest
 	output = [];
 	assert(!engine.parse("-", position, output));
 	assert(position == 0);
-	assert(output !is []);
+	assert(output is []);
 }
 
 alias General = GeneralImplementation!(Direction.forward);

@@ -1,4 +1,4 @@
-module fsm.sequence;
+module fsm.configurations;
 
 import std.conv;
 import fsm.common;
@@ -26,68 +26,68 @@ unittest
 	static assert(__traits(compiles, {auto engine = makeSequence("abc");}));
 	auto engine = makeSequence("abc");
 	size_t position;
-	OutputTerm[] output;
+	OutputTerm[] output = [];
 	assert(engine.parse("abc",position,output));
 	assert(position == 3);
 	assert(output[1].charSequence == "b");
 	assert(output.charSequence == "abc");
 	position = 0;
-	output = null;
+	output = [];
 	assert(!engine.parse("ab",position,output));
 	assert(position == 0);
-	assert(output is null);
+	assert(output is []);
 	position = 0;
-	output = null;
+	output = [];
 	assert(!engine.parse("acb",position,output));
 	assert(position == 0);
-	assert(output is null);
+	assert(output is []);
 	position = 0;
-	output = null;
+	output = [];
 	assert(!engine.parse("acb",position,output));
 	assert(position == 0);
-	assert(output is null);
+	assert(output is []);
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("abcdef",position,output));
 	assert(position == 3);
 	assert(output.charSequence == "abc");
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("abcabc",position,output));
 	assert(position == 3);
 	assert(output.charSequence == "abc");
 
 	engine = makeSequence(new SingleIdentity("a"), new RangeIdentity("0","9"));
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("a3",position,output));
 	assert(position == 2);
 	assert(output.charSequence == "a3");
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("a9",position,output));
 	assert(position == 2);
 	assert(output.charSequence == "a9");
 	position = 0;
-	output = null;
+	output = [];
 	assert(!engine.parse("3a",position,output));
 	assert(position == 0);
-	assert(output is null);
+	assert(output is []);
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("a3a5",position,output));
 	assert(position == 2);
 	assert(output.charSequence == "a3");
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("a334",position,output));
 	assert(position == 2);
 	assert(output.charSequence == "a3");
 	position = 0;
-	output = null;
+	output = [];
 	assert(!engine.parse("a",position,output));
 	assert(position == 0);
-	assert(output is null);
+	assert(output is []);
 }
 
 Engine makeSequence(Direction direction = Direction.forward)(string keyString)
@@ -137,44 +137,44 @@ unittest
 	OutputTerm[] output;
 
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("a3",position,output));
 	assert(position == 1);
 	assert(output.charSequence == "a");
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("9a",position,output));
 	assert(position == 1);
 	assert(output.charSequence == "9");
 	position = 0;
-	output = null;
+	output = [];
 	assert(!engine.parse("bac",position,output));
 	assert(position == 0);
-	assert(output is null);
+	assert(output is []);
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("3712",position,output));
 	assert(position == 1);
 	assert(output.charSequence == "3");
 	position = 0;
-	output = null;
+	output = [];
 
 	engine = makeParallel(makeSequence("zuzu"), makeSequence(new RangeIdentity("0", "5"), makeSequence("_item")));
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("zuzu27",position,output));
 	assert(position == 4);
 	assert(output.charSequence == "zuzu");
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("2_items",position,output));
 	assert(position == 6);
 	assert(output.charSequence == "2_item");
 	position = 0;
-	output = null;
+	output = [];
 	assert(!engine.parse("uzuzu",position,output));
 	assert(position == 0);
-	assert(output.charSequence == null);
+	assert(output.charSequence == []);
 }
 
 Engine makeParallel(Direction direction = Direction.forward)(Engine[] list...)
@@ -213,52 +213,54 @@ unittest
 	auto engine = makeCliniAsterisc(new SingleIdentity("a"));
 
 	size_t position;
-	OutputTerm[] output;
+	OutputTerm[] output = [];
 	assert(engine.parse("",position, output));
 	assert(position == 0);
-	assert(output.length == 0);// assert(output is null) fails :(
+	import std.stdio;
+	writeln(typeid(output));
+	assert(output is []);
 
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("a", position, output));
 	assert(position == 1);
 	assert(output.charSequence == "a");
 
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("aa", position, output));
 	assert(position == 2);
 	assert(output.charSequence == "aa");
 
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("aaa", position, output));
 	assert(position == 3);
 	assert(output.charSequence == "aaa");
 
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("aaa0", position, output));
 	assert(position == 3);
 	assert(output.charSequence == "aaa");
 
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("aaaabaa", position, output));
 	assert(position == 4);
 	assert(output.charSequence == "aaaa");
 
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("aaaaaaa", position, output));
 	assert(position == 7);
 	assert(output.charSequence == "aaaaaaa");
 
 	position = 0;
-	output = null;
+	output = [];
 	assert(engine.parse("baaaaaaa", position, output));
 	assert(position == 0);
-	assert(output.charSequence == "");
+	assert(output is []);
 }
 
 Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
