@@ -10,17 +10,6 @@ import fsm.configurations, fsm.elementar;
 
 void main()
 {
-
-	auto engine = makeCliniAsterisc(new SingleIdentity("a"));
-	
-	size_t position;
-	OutputTerm[] output = [];
-	assert(engine.parse("",position, output));
-	assert(position == 0);
-	import std.stdio;
-	writeln(typeid(output));
-	assert(output is []);
-
 	/+Engine[] steam_engine;
 	steam_engine~=new DigitLiteral;
 	steam_engine~=new SimpleReplace("#");

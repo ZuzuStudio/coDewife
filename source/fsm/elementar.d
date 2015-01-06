@@ -164,7 +164,39 @@ alias General = GeneralImplementation!(Direction.forward);
 
 unittest
 {
+	import terms.underscore, terms.invariantsequence;
+	auto engine = new GeneralReverse((string s) => "0" <= s && s <= "9", (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new LogicalUnderscore);
+	
+	size_t position = 4;
+	OutputTerm[] output = [];
+	assert(engine.parse("1234", position, output));
+	assert(engine.parse("1234", position, output));
+	assert(engine.parse("1234", position, output));
+	assert(position == 1);
+	LogicalUnderscore.printable = true;
+	assert(output.charSequence == "2_3_4_");
+	LogicalUnderscore.printable = false;
+	assert(output.charSequence == "234");
 
+	assert(engine.parse("1234", position, output));
+	assert(position == 0);
+	assert(output.charSequence == "1234");
+
+	assert(!engine.parse("1234", position, output));
+	assert(position == 0);
+	assert(output.charSequence == "1234");
+	
+	position = 1;
+	output = [];
+	assert(!engine.parse("-", position, output));
+	assert(position == 1);
+	assert(output is []);
+
+	position = 0;
+	output = [];
+	assert(!engine.parse("12", position, output));
+	assert(position == 0);
+	assert(output is []);
 }
 
 alias GeneralReverse = GeneralImplementation!(Direction.backward);
@@ -180,18 +212,22 @@ public:
 
 	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
 	{
-		static if(direction == Direction.forward)
+		size_t index = position;
+		static if(direction == Direction.backward)
 		{
-			if(position >= text.length)
+			if(index <= 0)
 				return false;
+			index -= strideBack(text, index);
 		}
 		else
 		{
-			if(position < 0)
+			if(index >= text.length)
 				return false;
 		}
-		size_t index = position;
+
 		auto symbol = to!string(decode(text, index));
+		static if(direction == Direction.backward)
+			index -= strideBack(text, index);
 		auto result = predicate(symbol);
 		if(result)
 		{
@@ -207,10 +243,4 @@ public:
 private:
 	bool function(string) predicate;
 	OutputTerm[] function(string) mapping;
-}
-
-dchar decodeReverse(S)(auto ref S str, ref size_t index)
-{
-	// TODO rid out dummy
-	return cast(dchar)'\0';
 }
