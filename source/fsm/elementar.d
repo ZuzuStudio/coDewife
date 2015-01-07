@@ -141,7 +141,7 @@ private mixin template MixSimpleParse(alias predicate)
 
 unittest
 {
-	import terms.underscore;
+	import terms.underscore, terms.invariantsequence;
 	auto engine = new General((string s) => s == "_", (string s) => cast(OutputTerm[])[] ~ new UserUnderscore);
 
 	size_t position;
@@ -157,7 +157,28 @@ unittest
 	output = [];
 	assert(!engine.parse("-", position, output));
 	assert(position == 0);
-	assert(output is []);
+	assert(output == []);
+
+
+	engine = new General((string s) => "А" <= s && s <= "Я", /+ both char is cyrillic +/
+	                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new InvariantSequence(s));
+	position = 0;
+	output = [];
+	assert(engine.parse("ЯНЫ", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "ЯЯ");
+	assert(engine.parse("ЯНЫ", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "ЯЯНН");
+	assert(!engine.parse("ЯНы", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "ЯЯНН");
+	assert(engine.parse("ЯНЫ", position, output));
+	assert(position == 6);
+	assert(output.charSequence == "ЯЯННЫЫ");
+	assert(!engine.parse("ЯНЫ", position, output));
+	assert(position == 6);
+	assert(output.charSequence == "ЯЯННЫЫ");
 }
 
 alias General = GeneralImplementation!(Direction.forward);
@@ -165,7 +186,7 @@ alias General = GeneralImplementation!(Direction.forward);
 unittest
 {
 	import terms.underscore, terms.invariantsequence;
-	auto engine = new GeneralReverse((string s) => "0" <= s && s <= "9", (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new LogicalUnderscore);
+	auto engine = new GeneralBackward((string s) => "0" <= s && s <= "9", (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new LogicalUnderscore);
 	
 	size_t position = 4;
 	OutputTerm[] output = [];
@@ -190,21 +211,36 @@ unittest
 	output = [];
 	assert(!engine.parse("-", position, output));
 	assert(position == 1);
-	assert(output is []);
+	assert(output == []);
 
 	position = 0;
 	output = [];
 	assert(!engine.parse("12", position, output));
 	assert(position == 0);
-	assert(output is []);
+	assert(output == []);
+
+	engine = new GeneralBackward((string s) => true,
+	                            (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))));
+	position = 0;
+	output = [];
+	assert(!engine.parse("Я", position, output));
+	assert(position == 0);
+	assert(output == []);
+
+	position = 3;
+	assert(engine.parse("1Э", position, output));
+	assert(position == 1);
+	assert(engine.parse("1Э", position, output));
+	assert(position == 0);
+	assert(output.charSequence == "2Ю");
 }
 
-alias GeneralReverse = GeneralImplementation!(Direction.backward);
+alias GeneralBackward = GeneralImplementation!(Direction.backward);
 
 final class GeneralImplementation(Direction direction): Engine
 {
 public:
-	this(bool function(string) predicate , OutputTerm[] function(string) mapping)
+	this(bool delegate(string) predicate , OutputTerm[] delegate(string) mapping)
 	{
 		this.predicate = predicate;
 		this.mapping = mapping;
@@ -241,6 +277,6 @@ public:
 	}
 
 private:
-	bool function(string) predicate;
-	OutputTerm[] function(string) mapping;
+	bool delegate(string) predicate;
+	OutputTerm[] delegate(string) mapping;
 }

@@ -8,6 +8,8 @@ interface Engine
 }
 
 enum Direction{forward, backward};
+alias forward = Direction.forward;
+alias backward = Direction.backward;
 
 package mixin template MixStandartParse(Direction direction = Direction.forward)
 {
@@ -40,10 +42,7 @@ package interface EdgeInterface
 	void addFinish(State finish);
 }
 
-alias Edge = EdgeImplementation!(Direction.forward);
-alias ReverseEdge = EdgeImplementation!(Direction.backward);
-
-package final class EdgeImplementation(Direction direction):EdgeInterface
+package final class Edge(Direction direction):EdgeInterface
 {
 public:
 	this(Engine engine, bool quasi = false)

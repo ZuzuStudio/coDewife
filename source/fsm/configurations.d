@@ -88,13 +88,49 @@ unittest
 	assert(!engine.parse("a",position,output));
 	assert(position == 0);
 	assert(output == []);
+
+	import std.stdio;
+	engine = makeSequence!backward("cba");
+	position = 3;
+	output = [];
+	assert(engine.parse("abc", position, output));
+	assert(position == 0);
+	assert(output.charSequence == "abc");
+
+	position = 3;
+	output = [];
+	assert(!engine.parse("acc",position,output));
+	assert(position == 3);
+	assert(output == []);
+	assert(!engine.parse("bac",position,output));
+	assert(position == 3);
+	assert(output == []);
+	assert(!engine.parse("cba",position,output));
+	assert(position == 3);
+	assert(output == []);
+
+	engine = makeSequence!backward("гвб");
+	position = 6;
+	output = [];
+	assert(engine.parse("бвг", position, output));
+	assert(position == 0);
+	assert(output.charSequence == "бвг");
 }
 
 Engine makeSequence(Direction direction = Direction.forward)(string keyString)
 {
+	import terms.invariantsequence;
 	Engine[] list;
 	foreach(dchar symbol; keyString)
-		list ~= new SingleIdentity(to!string(symbol));
+	{
+		static if(direction == forward)
+			list ~= new SingleIdentity(to!string(symbol));
+		else
+		{
+			list ~= new GeneralBackward((string s) => s == to!string(symbol),
+			                            (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));	
+		}
+	}
 	return makeSequence!direction(list);
 }
 
@@ -118,11 +154,11 @@ Engine makeSequence(Direction direction = Direction.forward)(Engine[] list)
 	foreach(engine; list)
 	{
 		auto newState = new State(nonterminal, good);
-		current.addEdge(new Edge(engine), newState);
-		current.addEdge(new Edge(new AllIdentity(), quasi), badCrash);
+		current.addEdge(new Edge!direction(engine), newState);
+		current.addEdge(new Edge!direction(new AllIdentity(), quasi), badCrash);
 		current = newState;
 	}
-	current.addEdge(new Edge(new AllIdentity(), quasi), goodCrash);
+	current.addEdge(new Edge!direction(new AllIdentity(), quasi), goodCrash);
 	return result;
 }
 
@@ -175,6 +211,23 @@ unittest
 	assert(!engine.parse("uzuzu",position,output));
 	assert(position == 0);
 	assert(output.charSequence == []);
+
+	engine = makeParallel!backward(makeSequence!backward("uzuz"), makeSequence!backward("cba"));
+	position = 7;
+	output = [];
+	assert(engine.parse("abczuzu", position, output));
+	assert(position == 3);
+	assert(output.charSequence == "zuzu");
+	assert(engine.parse("abczuzu", position, output));
+	assert(position == 0);
+	assert(output.charSequence == "abczuzu");
+
+	position = 7;
+	output = [];
+	assert(!engine.parse("bczuzua", position, output));
+	assert(position == 7);
+	assert(output == []);
+
 }
 
 Engine makeParallel(Direction direction = Direction.forward)(Engine[] list...)
@@ -195,14 +248,15 @@ Engine makeParallel(Direction direction = Direction.forward)(Engine[] list)
 	auto badCrash = new State(terminal, bad);
 	State current = result.start;
 	auto goodState = new State(nonterminal, good);
-	goodState.addEdge(new Edge(new AllIdentity(), quasi), goodCrash);
+	goodState.addEdge(new Edge!direction(new AllIdentity(), quasi), goodCrash);
 	foreach(engine; list)
 	{
-		current.addEdge(new Edge(engine), goodState);
+		current.addEdge(new Edge!direction(engine), goodState);
 	}
-	current.addEdge(new Edge(new AllIdentity(), quasi), badCrash);
+	current.addEdge(new Edge!direction(new AllIdentity(), quasi), badCrash);
 	return result;
 }
+
 
 unittest
 {
@@ -259,6 +313,15 @@ unittest
 	assert(engine.parse("baaaaaaa", position, output));
 	assert(position == 0);
 	assert(output == []);
+
+	import terms.invariantsequence;
+	engine = makeCliniAsterisc!backward(new GeneralBackward((string s) => "0" <= s && s <= "9",
+	                                                        (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s)));
+	position = 7;
+	output = [];
+	assert(engine.parse("123a456", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "456");
 }
 
 Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
@@ -272,9 +335,9 @@ Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
 	result.start = new State(nonterminal, good);
 	auto goodCrash = new State(terminal, good);
 	auto newState = new State(nonterminal, good);
-	result.start.addEdge(new Edge(engine), newState);
-	result.start.addEdge(new Edge(new AllIdentity, quasi), goodCrash);
-	newState.addEdge(new Edge(engine), newState);
-	newState.addEdge(new Edge(new AllIdentity, quasi), goodCrash);
+	result.start.addEdge(new Edge!direction(engine), newState);
+	result.start.addEdge(new Edge!direction(new AllIdentity, quasi), goodCrash);
+	newState.addEdge(new Edge!direction(engine), newState);
+	newState.addEdge(new Edge!direction(new AllIdentity, quasi), goodCrash);
 	return result;
 }
