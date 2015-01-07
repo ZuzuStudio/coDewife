@@ -3,7 +3,7 @@
 	"description": "code formatter",
 	"authors": ["HaraldZealot", "krucios"],
 	"homepage": "https://github.com/ZuzuStudio/coDewife",
-	"copyright": "Copyright (c) 2014 Aliaksei Stankevich",
+	"copyright": "Copyright (c) 2014 Aliaksei Stankevich, Andrei Pazniak",
 	"configurations":[
 		{
 			"name": "library",
