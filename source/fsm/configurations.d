@@ -341,3 +341,92 @@ Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
 	newState.addEdge(new Edge!direction(new AllIdentity, quasi), goodCrash);
 	return result;
 }
+
+unittest
+{
+	import terms.invariantsequence;
+	auto engine = makeHitherAndThither(makeCliniAsterisc(new General((string s) => "0" <= s && s <= "9", (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
+	                                   makeSequence!backward(makeCliniAsterisc!backward(new GeneralBackward((string s) => s == "2" || s == "5",
+	                                                                                                        (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))))),
+	                                                         new GeneralBackward((string s) => true,
+	                                                                             (string s) => cast(OutputTerm[])[] ~ new InvariantSequence("_"))));
+
+	size_t position = 0;
+	OutputTerm[] output = [];
+	assert(engine.parse("32452552a b25", position, output));
+	assert(position == 8);
+	assert(output.charSequence == "32452552_63663");
+
+	engine = makeHitherAndThither(makeCliniAsterisc(new General((string s) => "1" <= s && s <= "9", 
+	                                                            (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
+	                              new GeneralBackward((string s) => s == "3" || s == "6" || s == "9",
+	                                                  (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(":" ~ s)));
+	position = 0;
+	output = [];
+	assert(!engine.parse("12567ttt", position, output));
+	assert(position==0);
+	assert(output == []);
+	assert(engine.parse("12576ttt", position, output));
+	assert(position == 5);
+	assert(output.charSequence == "12576:6");
+}
+
+Engine makeHitherAndThither(Direction direction = Direction.forward)(Engine hither, Engine thither)
+{
+	static class SpecialEdge(Direction direction): EdgeInterface
+	{
+		this(Engine engine)
+		{
+			this.engine = engine;
+		}
+
+		override bool parse(string text, ref size_t position, ref OutputTerm[] output, ref State state)
+		{
+			assert(engine);
+			assert(finish);
+			size_t internalPosition = position;
+			OutputTerm[] internalOutput = [];
+			auto result = engine.parse(text, internalPosition, internalOutput);
+			if(result)
+				state = finish;
+			output ~= [];
+			if(result)
+			{
+				static if(direction == Direction.forward)
+					output ~= internalOutput;
+				else
+					output = internalOutput ~ output;
+			}
+			return result;
+		}
+
+		override void addFinish(State finish)
+		{
+			this.finish = finish;
+		}
+
+	private:
+		State finish;
+		Engine engine;
+	}
+
+	enum terminal = true;
+	enum nonterminal = false;
+	enum good = true;
+	enum bad = false;
+	enum quasi = true;
+	auto result = new Configurator!direction;
+	result.start = new State(nonterminal, good);
+	auto goodCrash = new State(terminal, good);
+	auto badCrash = new State(terminal, bad);
+
+	auto newState = new State(nonterminal, good);
+
+	result.start.addEdge(new Edge!direction(hither), newState);
+	result.start.addEdge(new Edge!direction(new AllIdentity, quasi), badCrash);
+
+	newState.addEdge(new SpecialEdge!direction(thither), goodCrash);
+	newState.addEdge(new Edge!direction(new AllIdentity), badCrash);
+
+	return result;
+}
