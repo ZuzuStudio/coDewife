@@ -35,17 +35,17 @@ unittest
 	output = [];
 	assert(!engine.parse("ab",position,output));
 	assert(position == 0);
-	assert(output is []);
+	assert(output == []);
 	position = 0;
 	output = [];
 	assert(!engine.parse("acb",position,output));
 	assert(position == 0);
-	assert(output is []);
+	assert(output == []);
 	position = 0;
 	output = [];
 	assert(!engine.parse("acb",position,output));
 	assert(position == 0);
-	assert(output is []);
+	assert(output == []);
 	position = 0;
 	output = [];
 	assert(engine.parse("abcdef",position,output));
@@ -72,7 +72,7 @@ unittest
 	output = [];
 	assert(!engine.parse("3a",position,output));
 	assert(position == 0);
-	assert(output is []);
+	assert(output == []);
 	position = 0;
 	output = [];
 	assert(engine.parse("a3a5",position,output));
@@ -87,7 +87,7 @@ unittest
 	output = [];
 	assert(!engine.parse("a",position,output));
 	assert(position == 0);
-	assert(output is []);
+	assert(output == []);
 }
 
 Engine makeSequence(Direction direction = Direction.forward)(string keyString)
@@ -150,7 +150,7 @@ unittest
 	output = [];
 	assert(!engine.parse("bac",position,output));
 	assert(position == 0);
-	assert(output is []);
+	assert(output == []);
 	position = 0;
 	output = [];
 	assert(engine.parse("3712",position,output));
@@ -216,8 +216,7 @@ unittest
 	OutputTerm[] output = [];
 	assert(engine.parse("",position, output));
 	assert(position == 0);
-	//TODO fix bug (assertation failure)
-	//assert(output is []);
+	assert(output == []);
 
 	position = 0;
 	output = [];
@@ -259,8 +258,7 @@ unittest
 	output = [];
 	assert(engine.parse("baaaaaaa", position, output));
 	assert(position == 0);
-	//TODO fix bug (assertation failure)
-	//assert(output is []);
+	assert(output == []);
 }
 
 Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
