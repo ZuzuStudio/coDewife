@@ -18,18 +18,18 @@ package mixin template MixStandartParse(Direction direction = Direction.forward)
 		auto current = start;
 		auto internalPosition = position;
 		OutputTerm[] internalOutput = [];
-		while(!current.terminal)
+		while(!current.status)
 		{
 			for(auto i=0;i < current.links.length && !current.links[i].parse(text, internalPosition, internalOutput, current);++i)
 			{
 			}
 		}
-		if(current.quality)
+		if(current.status & goodness)
 		{
 			position = internalPosition;
 			glue!direction(output, internalOutput);
 		}
-		return current.quality;
+		return current.status & goodness;
 	}
 }
 
@@ -77,13 +77,14 @@ private:
 	bool quasi;
 }
 
+enum : ubyte {trivial = 0, bad = 2, good = 3, terminalness = 2, goodness = 1}; 
+
 package final class State
 {
 public:
-	this(bool terminal, bool quality)
+	this(ubyte status = trivial)pure
 	{
-		this.terminal=terminal;
-		this.quality = quality;
+		this.status = status;
 	}
 
 	void addEdge(EdgeInterface edge, State target)
@@ -93,8 +94,7 @@ public:
 	}
 
 package:
-	bool terminal;
-	bool quality;
+	immutable ubyte status;
 	EdgeInterface[] links;
 }
 
