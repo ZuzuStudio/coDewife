@@ -33,11 +33,8 @@ public:
 					return false;
 			}
 
-			static if(direction == forward)
-				auto symbol = to!string(decode(text, index));
-			else
-				auto symbol = to!string(decodeBack(text, index));
-				
+			auto symbol = to!string(decode!direction(text, index));
+
 			auto result = predicate(symbol);
 			if(result)
 			{
@@ -322,10 +319,13 @@ Engine makeGeneral(Direction direction = forward)
 	return new Elementar!direction(predicate, mapping);
 }
 
-private auto decodeBack(string str, ref size_t index)
+private auto decode(Direction direction = forward)(string str, ref size_t index)
 {
-	index -= strideBack(str, index);
-	auto result = decode(str, index);
-	index -= strideBack(str, index);
+	import std.utf;
+	static if(direction == backward)
+		index -= strideBack(str, index);
+	auto result = std.utf.decode(str, index);
+	static if(direction == backward)
+		index -= strideBack(str, index);
 	return result;
 }
