@@ -32,10 +32,7 @@ public:
 			if(result)
 			{
 				position = index;
-				static if(direction == forward)
-					output ~= mapping(symbol);
-				else
-					output = mapping(symbol) ~ output;
+				glue!direction(output, mapping(symbol));
 			}
 			return result;
 		} else                                                    // !!! IT SHOULD BE REMOVED
@@ -329,4 +326,12 @@ private auto isOverboard(Direction direction)(size_t index, lazy size_t length)
 		return index >= length;
 	else
 		return index == 0;
+}
+
+private void glue(Direction direction)(ref OutputTerm[] output, OutputTerm[] tail)
+{
+	static if(direction == forward)
+		output ~= tail;
+	else
+		output = tail ~ output;
 }
