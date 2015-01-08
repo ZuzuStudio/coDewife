@@ -327,11 +327,3 @@ private auto isOverboard(Direction direction)(size_t index, lazy size_t length)
 	else
 		return index == 0;
 }
-
-private void glue(Direction direction)(ref OutputTerm[] output, OutputTerm[] tail)
-{
-	static if(direction == forward)
-		output ~= tail;
-	else
-		output = tail ~ output;
-}

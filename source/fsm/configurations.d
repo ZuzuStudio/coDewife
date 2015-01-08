@@ -148,24 +148,19 @@ Engine makeSequence(Direction direction = Direction.forward)(Engine[] list...)
 
 Engine makeSequence(Direction direction = Direction.forward)(Engine[] list)
 {
-	enum terminal = true;
-	enum nonterminal = false;
-	enum good = true;
-	enum bad = false;
-	enum quasi = true;
 	auto result = new Configurator!direction;
-	result.start = new State(nonterminal, good);
-	auto goodCrash = new State(terminal, good);
-	auto badCrash = new State(terminal, bad);
+	result.start = new State;
+	auto goodCrash = new State(good);
+	auto badCrash = new State(bad);
 	State current = result.start;
 	foreach(engine; list)
 	{
-		auto newState = new State(nonterminal, good);
+		auto newState = new State;
 		current.addEdge(new Edge!direction(engine), newState);
-		current.addEdge(new Edge!direction(makeAllIdentity(), quasi), badCrash);
+		current.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), badCrash);
 		current = newState;
 	}
-	current.addEdge(new Edge!direction(makeAllIdentity(), quasi), goodCrash);
+	current.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), goodCrash);
 	return result;
 }
 
@@ -244,23 +239,18 @@ Engine makeParallel(Direction direction = Direction.forward)(Engine[] list...)
 
 Engine makeParallel(Direction direction = Direction.forward)(Engine[] list)
 {
-	enum terminal = true;
-	enum nonterminal = false;
-	enum good = true;
-	enum bad = false;
-	enum quasi = true;
 	auto result = new Configurator!direction;
-	result.start = new State(nonterminal, good);
-	auto goodCrash = new State(terminal, good);
-	auto badCrash = new State(terminal, bad);
+	result.start = new State;
+	auto goodCrash = new State(good);
+	auto badCrash = new State(bad);
 	State current = result.start;
-	auto goodState = new State(nonterminal, good);
-	goodState.addEdge(new Edge!direction(makeAllIdentity(), quasi), goodCrash);
+	auto goodState = new State;
+	goodState.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), goodCrash);
 	foreach(engine; list)
 	{
 		current.addEdge(new Edge!direction(engine), goodState);
 	}
-	current.addEdge(new Edge!direction(makeAllIdentity(), quasi), badCrash);
+	current.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), badCrash);
 	return result;
 }
 
@@ -333,19 +323,15 @@ unittest
 
 Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
 {
-	enum terminal = true;
-	enum nonterminal = false;
-	enum good = true;
-	enum bad = false;
 	enum quasi = true;
 	auto result = new Configurator!direction;
-	result.start = new State(nonterminal, good);
-	auto goodCrash = new State(terminal, good);
-	auto newState = new State(nonterminal, good);
+	result.start = new State;
+	auto goodCrash = new State(good);
+	auto newState = new State;
 	result.start.addEdge(new Edge!direction(engine), newState);
-	result.start.addEdge(new Edge!direction(makeAllIdentity, quasi), goodCrash);
+	result.start.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), goodCrash);
 	newState.addEdge(new Edge!direction(engine), newState);
-	newState.addEdge(new Edge!direction(makeAllIdentity, quasi), goodCrash);
+	newState.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), goodCrash);
 	return result;
 }
 
@@ -381,60 +367,18 @@ unittest
 
 Engine makeHitherAndThither(Direction direction = Direction.forward)(Engine hither, Engine thither)
 {
-	static class SpecialEdge(Direction direction): EdgeInterface
-	{
-		this(Engine engine)
-		{
-			this.engine = engine;
-		}
-
-		override bool parse(string text, ref size_t position, ref OutputTerm[] output, ref State state)
-		{
-			assert(engine);
-			assert(finish);
-			size_t internalPosition = position;
-			OutputTerm[] internalOutput = [];
-			auto result = engine.parse(text, internalPosition, internalOutput);
-			if(result)
-				state = finish;
-			output ~= [];
-			if(result)
-			{
-				static if(direction == Direction.forward)
-					output ~= internalOutput;
-				else
-					output = internalOutput ~ output;
-			}
-			return result;
-		}
-
-		override void addFinish(State finish)
-		{
-			this.finish = finish;
-		}
-
-	private:
-		State finish;
-		Engine engine;
-	}
-
-	enum terminal = true;
-	enum nonterminal = false;
-	enum good = true;
-	enum bad = false;
-	enum quasi = true;
 	auto result = new Configurator!direction;
-	result.start = new State(nonterminal, good);
-	auto goodCrash = new State(terminal, good);
-	auto badCrash = new State(terminal, bad);
+	result.start = new State;
+	auto goodCrash = new State(good);
+	auto badCrash = new State(bad);
 
-	auto newState = new State(nonterminal, good);
+	auto newState = new State;
 
 	result.start.addEdge(new Edge!direction(hither), newState);
-	result.start.addEdge(new Edge!direction(makeAllIdentity, quasi), badCrash);
+	result.start.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), badCrash);
 
-	newState.addEdge(new SpecialEdge!direction(thither), goodCrash);
-	newState.addEdge(new Edge!direction(makeAllIdentity), badCrash);
+	newState.addEdge(new Edge!(direction, reverse)(thither), goodCrash);
+	newState.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), badCrash);
 
 	return result;
 }

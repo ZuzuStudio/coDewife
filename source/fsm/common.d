@@ -18,21 +18,18 @@ package mixin template MixStandartParse(Direction direction = Direction.forward)
 		auto current = start;
 		auto internalPosition = position;
 		OutputTerm[] internalOutput = [];
-		while(!current.terminal)
+		while(!current.status)
 		{
 			for(auto i=0;i < current.links.length && !current.links[i].parse(text, internalPosition, internalOutput, current);++i)
 			{
 			}
 		}
-		if(current.quality)
+		if(current.status & goodness)
 		{
 			position = internalPosition;
-			static if(direction == Direction.forward)
-				output ~= internalOutput;
-			else
-				output = internalOutput ~ output;
+			glue!direction(output, internalOutput);
 		}
-		return current.quality;
+		return current.status & goodness;
 	}
 }
 
@@ -42,13 +39,16 @@ package interface EdgeInterface
 	void addFinish(State finish);
 }
 
-package final class Edge(Direction direction):EdgeInterface
+package enum : ubyte {simple = 0, quasi, reverse};
+
+package final class Edge(Direction direction, ubyte type = simple)
+	if(type == simple || type == quasi || type == reverse)
+		:EdgeInterface
 {
 public:
-	this(Engine engine, bool quasi = false)
+	this(Engine engine)
 	{
 		this.engine = engine;
-		this.quasi = quasi;
 	}
 
 	override bool parse(string text, ref size_t position, ref OutputTerm[] output, ref State state)
@@ -61,14 +61,13 @@ public:
 		if(result)
 			state = finish;
 		output ~= [];
-		if(result && !quasi)
-		{
-			position = internalPosition;
-			static if(direction == Direction.forward)
-				output ~= internalOutput;
-			else
-				output = internalOutput ~ output;
-		}
+		static if(type != quasi)
+			if(result)
+			{
+				static if(type == simple)
+					position = internalPosition;
+				glue!direction(output, internalOutput);
+			}
 		return result;
 	}
 
@@ -80,16 +79,16 @@ public:
 private:
 	State finish;
 	Engine engine;
-	bool quasi;
 }
+
+package enum : ubyte {trivial = 0, bad = 2, good = 3, terminalness = 2, goodness = 1}; 
 
 package final class State
 {
 public:
-	this(bool terminal, bool quality)
+	this(ubyte status = trivial)pure
 	{
-		this.terminal=terminal;
-		this.quality = quality;
+		this.status = status;
 	}
 
 	void addEdge(EdgeInterface edge, State target)
@@ -99,7 +98,14 @@ public:
 	}
 
 package:
-	bool terminal;
-	bool quality;
+	immutable ubyte status;
 	EdgeInterface[] links;
+}
+
+package void glue(Direction direction)(ref OutputTerm[] output, OutputTerm[] tail)
+{
+	static if(direction == forward)
+		output ~= tail;
+	else
+		output = tail ~ output;
 }
