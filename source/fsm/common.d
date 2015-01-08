@@ -39,13 +39,16 @@ package interface EdgeInterface
 	void addFinish(State finish);
 }
 
-package final class Edge(Direction direction):EdgeInterface
+package enum : ubyte {simple = 0, quasi, reverse};
+
+package final class Edge(Direction direction, ubyte type = simple)
+	if(type == simple || type == quasi || type == reverse)
+		:EdgeInterface
 {
 public:
-	this(Engine engine, bool quasi = false)
+	this(Engine engine)
 	{
 		this.engine = engine;
-		this.quasi = quasi;
 	}
 
 	override bool parse(string text, ref size_t position, ref OutputTerm[] output, ref State state)
@@ -58,11 +61,13 @@ public:
 		if(result)
 			state = finish;
 		output ~= [];
-		if(result && !quasi)
-		{
-			position = internalPosition;
-			glue!direction(output, internalOutput);
-		}
+		static if(type != quasi)
+			if(result)
+			{
+				static if(type == simple)
+					position = internalPosition;
+				glue!direction(output, internalOutput);
+			}
 		return result;
 	}
 
@@ -74,10 +79,9 @@ public:
 private:
 	State finish;
 	Engine engine;
-	bool quasi;
 }
 
-enum : ubyte {trivial = 0, bad = 2, good = 3, terminalness = 2, goodness = 1}; 
+package enum : ubyte {trivial = 0, bad = 2, good = 3, terminalness = 2, goodness = 1}; 
 
 package final class State
 {
