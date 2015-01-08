@@ -26,17 +26,18 @@ public:
 			{
 				if(index <= 0)
 					return false;
-				index -= strideBack(text, index);
 			}
 			else
 			{
 				if(index >= text.length)
 					return false;
 			}
-			
-			auto symbol = to!string(decode(text, index));
-			static if(direction == Direction.backward)
-				index -= strideBack(text, index);
+
+			static if(direction == Direction.forward)
+				auto symbol = to!string(decode(text, index));
+			else
+				auto symbol = to!string(decodeBack(text, index));
+				
 			auto result = predicate(symbol);
 			if(result)
 			{
@@ -319,4 +320,12 @@ Engine makeGeneral(Direction direction = Direction.forward)
                   (bool delegate(string) predicate , OutputTerm[] delegate(string) mapping)
 {
 	return new Elementar!direction(predicate, mapping);
+}
+
+private auto decodeBack(string str, ref size_t index)
+{
+	index -= strideBack(str, index);
+	auto result = decode(str, index);
+	index -= strideBack(str, index);
+	return result;
 }
