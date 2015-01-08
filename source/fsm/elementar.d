@@ -22,7 +22,7 @@ public:
 		if (!key) // !!! IT SHOULD BE REMOVED
 		{
 			size_t index = position;
-			static if(direction == Direction.backward)
+			static if(direction == backward)
 			{
 				if(index <= 0)
 					return false;
@@ -33,7 +33,7 @@ public:
 					return false;
 			}
 
-			static if(direction == Direction.forward)
+			static if(direction == forward)
 				auto symbol = to!string(decode(text, index));
 			else
 				auto symbol = to!string(decodeBack(text, index));
@@ -42,7 +42,7 @@ public:
 			if(result)
 			{
 				position = index;
-				static if(direction == Direction.forward)
+				static if(direction == forward)
 					output ~= mapping(symbol);
 				else
 					output = mapping(symbol) ~ output;
@@ -91,7 +91,7 @@ unittest
 	output = null;
 }
 
-Engine makeSingleIdentity(Direction direction = Direction.forward)(string symbol)
+Engine makeSingleIdentity(Direction direction = forward)(string symbol)
 {
 	return new Elementar!direction(delegate (string s) => s == symbol,
 	                               delegate (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
@@ -158,7 +158,7 @@ unittest
 	assert(output.charSequence == "ар");
 }
 
-Engine makeRangeIdentity(Direction direction = Direction.forward)(string down, string up)
+Engine makeRangeIdentity(Direction direction = forward)(string down, string up)
 {
 	return new Elementar!direction(delegate (string s) => down <= s && s <= up,
 	                               delegate (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
@@ -214,7 +214,7 @@ unittest
 	+/
 }
 
-Engine makeAllIdentity(Direction direction = Direction.forward)()
+Engine makeAllIdentity(Direction direction = forward)()
 {
 	auto obj = new Elementar!direction(delegate (string s) => true, delegate (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
 
@@ -225,7 +225,7 @@ Engine makeAllIdentity(Direction direction = Direction.forward)()
 unittest
 {
 	import terms.underscore, terms.invariantsequence;
-	auto engine = makeGeneral!(Direction.forward)((string s) => s == "_", (string s) => cast(OutputTerm[])[] ~ new UserUnderscore);
+	auto engine = makeGeneral((string s) => s == "_", (string s) => cast(OutputTerm[])[] ~ new UserUnderscore);
 
 	size_t position;
 	OutputTerm[] output = [];
@@ -243,7 +243,7 @@ unittest
 	assert(output == []);
 
 
-	engine = makeGeneral!(Direction.forward)((string s) => "А" <= s && s <= "Я", /+ both char is cyrillic +/
+	engine = makeGeneral((string s) => "А" <= s && s <= "Я", /+ both char is cyrillic +/
 	                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new InvariantSequence(s));
 	position = 0;
 	output = [];
@@ -267,7 +267,7 @@ unittest
 unittest
 {
 	import terms.underscore, terms.invariantsequence;
-	auto engine = makeGeneral!(Direction.backward)((string s) => "0" <= s && s <= "9", (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new LogicalUnderscore);
+	auto engine = makeGeneral!backward((string s) => "0" <= s && s <= "9", (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new LogicalUnderscore);
 	
 	size_t position = 4;
 	OutputTerm[] output = [];
@@ -300,7 +300,7 @@ unittest
 	assert(position == 0);
 	assert(output == []);
 	
-	engine = makeGeneral!(Direction.backward)((string s) => true,
+	engine = makeGeneral!backward((string s) => true,
 	                             (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))));
 	position = 0;
 	output = [];
@@ -316,7 +316,7 @@ unittest
 	assert(output.charSequence == "2Ю");
 }
 
-Engine makeGeneral(Direction direction = Direction.forward)
+Engine makeGeneral(Direction direction = forward)
                   (bool delegate(string) predicate , OutputTerm[] delegate(string) mapping)
 {
 	return new Elementar!direction(predicate, mapping);
