@@ -22,16 +22,9 @@ public:
 		if (!key) // !!! IT SHOULD BE REMOVED
 		{
 			size_t index = position;
-			static if(direction == backward)
-			{
-				if(index <= 0)
+
+			if(isOverboard!direction(index, text.length))
 					return false;
-			}
-			else
-			{
-				if(index >= text.length)
-					return false;
-			}
 
 			auto symbol = to!string(decode!direction(text, index));
 
@@ -328,4 +321,12 @@ private auto decode(Direction direction = forward)(string str, ref size_t index)
 	static if(direction == backward)
 		index -= strideBack(str, index);
 	return result;
+}
+
+private auto isOverboard(Direction direction)(size_t index, lazy size_t length)
+{
+	static if(direction == forward)
+		return index >= length;
+	else
+		return index == 0;
 }
