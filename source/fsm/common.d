@@ -27,10 +27,7 @@ package mixin template MixStandartParse(Direction direction = Direction.forward)
 		if(current.quality)
 		{
 			position = internalPosition;
-			static if(direction == Direction.forward)
-				output ~= internalOutput;
-			else
-				output = internalOutput ~ output;
+			glue!direction(output, internalOutput);
 		}
 		return current.quality;
 	}
@@ -64,10 +61,7 @@ public:
 		if(result && !quasi)
 		{
 			position = internalPosition;
-			static if(direction == Direction.forward)
-				output ~= internalOutput;
-			else
-				output = internalOutput ~ output;
+			glue!direction(output, internalOutput);
 		}
 		return result;
 	}
@@ -102,4 +96,12 @@ package:
 	bool terminal;
 	bool quality;
 	EdgeInterface[] links;
+}
+
+package void glue(Direction direction)(ref OutputTerm[] output, OutputTerm[] tail)
+{
+	static if(direction == forward)
+		output ~= tail;
+	else
+		output = tail ~ output;
 }
