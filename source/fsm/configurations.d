@@ -21,9 +21,16 @@ private:
 unittest
 {
 	import std.traits;
-
-	static assert(__traits(compiles, {auto engine = makeSequence(new SingleIdentity("a"), new RangeIdentity("0","9"));}));
-	static assert(__traits(compiles, {auto engine = makeSequence("abc");}));
+	static assert(__traits(compiles, 
+	    {
+		    auto engine = makeSequence(makeSingleIdentity("a"), 
+		                               makeRangeIdentity("0","9")
+		                              );
+	    }));
+	static assert(__traits(compiles, 
+	    {
+		    auto engine = makeSequence("abc");
+	    }));
 	auto engine = makeSequence("abc");
 	size_t position;
 	OutputTerm[] output = [];
@@ -57,7 +64,7 @@ unittest
 	assert(position == 3);
 	assert(output.charSequence == "abc");
 
-	engine = makeSequence(new SingleIdentity("a"), new RangeIdentity("0","9"));
+	engine = makeSequence(makeSingleIdentity("a"), makeRangeIdentity("0","9"));
 	position = 0;
 	output = [];
 	assert(engine.parse("a3",position,output));
@@ -124,11 +131,11 @@ Engine makeSequence(Direction direction = Direction.forward)(string keyString)
 	foreach(dchar symbol; keyString)
 	{
 		static if(direction == forward)
-			list ~= new SingleIdentity(to!string(symbol));
+			list ~= makeSingleIdentity(to!string(symbol));
 		else
 		{
-			list ~= new GeneralBackward((string s) => s == to!string(symbol),
-			                            (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));	
+			list ~= makeGeneral!(Direction.backward)((string s) => s == to!string(symbol),
+			                                         (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));	
 		}
 	}
 	return makeSequence!direction(list);
@@ -155,10 +162,10 @@ Engine makeSequence(Direction direction = Direction.forward)(Engine[] list)
 	{
 		auto newState = new State(nonterminal, good);
 		current.addEdge(new Edge!direction(engine), newState);
-		current.addEdge(new Edge!direction(new AllIdentity(), quasi), badCrash);
+		current.addEdge(new Edge!direction(makeAllIdentity(), quasi), badCrash);
 		current = newState;
 	}
-	current.addEdge(new Edge!direction(new AllIdentity(), quasi), goodCrash);
+	current.addEdge(new Edge!direction(makeAllIdentity(), quasi), goodCrash);
 	return result;
 }
 
@@ -166,9 +173,9 @@ unittest
 {
 	import std.traits;
 
-	static assert(__traits(compiles, {auto engine = makeParallel(new SingleIdentity("a"), new RangeIdentity("0","9"));}));
+	static assert(__traits(compiles, {auto engine = makeParallel(makeSingleIdentity("a"), makeRangeIdentity("0","9"));}));
 	
-	auto engine = makeParallel(new SingleIdentity("a"), new RangeIdentity("0","9"));
+	auto engine = makeParallel(makeSingleIdentity("a"), makeRangeIdentity("0","9"));
 	size_t position;
 	OutputTerm[] output;
 
@@ -195,7 +202,7 @@ unittest
 	position = 0;
 	output = [];
 
-	engine = makeParallel(makeSequence("zuzu"), makeSequence(new RangeIdentity("0", "5"), makeSequence("_item")));
+	engine = makeParallel(makeSequence("zuzu"), makeSequence(makeRangeIdentity("0", "5"), makeSequence("_item")));
 	position = 0;
 	output = [];
 	assert(engine.parse("zuzu27",position,output));
@@ -248,12 +255,12 @@ Engine makeParallel(Direction direction = Direction.forward)(Engine[] list)
 	auto badCrash = new State(terminal, bad);
 	State current = result.start;
 	auto goodState = new State(nonterminal, good);
-	goodState.addEdge(new Edge!direction(new AllIdentity(), quasi), goodCrash);
+	goodState.addEdge(new Edge!direction(makeAllIdentity(), quasi), goodCrash);
 	foreach(engine; list)
 	{
 		current.addEdge(new Edge!direction(engine), goodState);
 	}
-	current.addEdge(new Edge!direction(new AllIdentity(), quasi), badCrash);
+	current.addEdge(new Edge!direction(makeAllIdentity(), quasi), badCrash);
 	return result;
 }
 
@@ -262,9 +269,9 @@ unittest
 {
 	import std.traits;
 	
-	static assert(__traits(compiles, {auto engine = makeCliniAsterisc(new SingleIdentity("a"));}));
+	static assert(__traits(compiles, {auto engine = makeCliniAsterisc(makeSingleIdentity("a"));}));
 
-	auto engine = makeCliniAsterisc(new SingleIdentity("a"));
+	auto engine = makeCliniAsterisc(makeSingleIdentity("a"));
 
 	size_t position;
 	OutputTerm[] output = [];
@@ -315,8 +322,8 @@ unittest
 	assert(output == []);
 
 	import terms.invariantsequence;
-	engine = makeCliniAsterisc!backward(new GeneralBackward((string s) => "0" <= s && s <= "9",
-	                                                        (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s)));
+	engine = makeCliniAsterisc!backward(makeGeneral!(Direction.backward)((string s) => "0" <= s && s <= "9",
+	                                                                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s)));
 	position = 7;
 	output = [];
 	assert(engine.parse("123a456", position, output));
@@ -336,20 +343,21 @@ Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
 	auto goodCrash = new State(terminal, good);
 	auto newState = new State(nonterminal, good);
 	result.start.addEdge(new Edge!direction(engine), newState);
-	result.start.addEdge(new Edge!direction(new AllIdentity, quasi), goodCrash);
+	result.start.addEdge(new Edge!direction(makeAllIdentity, quasi), goodCrash);
 	newState.addEdge(new Edge!direction(engine), newState);
-	newState.addEdge(new Edge!direction(new AllIdentity, quasi), goodCrash);
+	newState.addEdge(new Edge!direction(makeAllIdentity, quasi), goodCrash);
 	return result;
 }
 
 unittest
 {
 	import terms.invariantsequence;
-	auto engine = makeHitherAndThither(makeCliniAsterisc(new General((string s) => "0" <= s && s <= "9", (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
-	                                   makeSequence!backward(makeCliniAsterisc!backward(new GeneralBackward((string s) => s == "2" || s == "5",
-	                                                                                                        (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))))),
-	                                                         new GeneralBackward((string s) => true,
-	                                                                             (string s) => cast(OutputTerm[])[] ~ new InvariantSequence("_"))));
+	auto engine = makeHitherAndThither(makeCliniAsterisc(makeGeneral((string s) => "0" <= s && s <= "9", 
+	                                                                 (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
+	                                   makeSequence!backward(makeCliniAsterisc!backward(makeGeneral!(Direction.backward)((string s) => s == "2" || s == "5",
+	                                                                                                                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))))),
+	                                                         makeGeneral!(Direction.backward)((string s) => true,
+	                                                                                          (string s) => cast(OutputTerm[])[] ~ new InvariantSequence("_"))));
 
 	size_t position = 0;
 	OutputTerm[] output = [];
@@ -357,10 +365,10 @@ unittest
 	assert(position == 8);
 	assert(output.charSequence == "32452552_63663");
 
-	engine = makeHitherAndThither(makeCliniAsterisc(new General((string s) => "1" <= s && s <= "9", 
+	engine = makeHitherAndThither(makeCliniAsterisc(makeGeneral((string s) => "1" <= s && s <= "9", 
 	                                                            (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
-	                              new GeneralBackward((string s) => s == "3" || s == "6" || s == "9",
-	                                                  (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(":" ~ s)));
+	                              makeGeneral!(Direction.backward)((string s) => s == "3" || s == "6" || s == "9",
+	                                                               (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(":" ~ s)));
 	position = 0;
 	output = [];
 	assert(!engine.parse("12567ttt", position, output));
@@ -423,10 +431,10 @@ Engine makeHitherAndThither(Direction direction = Direction.forward)(Engine hith
 	auto newState = new State(nonterminal, good);
 
 	result.start.addEdge(new Edge!direction(hither), newState);
-	result.start.addEdge(new Edge!direction(new AllIdentity, quasi), badCrash);
+	result.start.addEdge(new Edge!direction(makeAllIdentity, quasi), badCrash);
 
 	newState.addEdge(new SpecialEdge!direction(thither), goodCrash);
-	newState.addEdge(new Edge!direction(new AllIdentity), badCrash);
+	newState.addEdge(new Edge!direction(makeAllIdentity), badCrash);
 
 	return result;
 }
