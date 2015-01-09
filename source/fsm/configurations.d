@@ -259,9 +259,9 @@ unittest
 {
 	import std.traits;
 	
-	static assert(__traits(compiles, {auto engine = makeCliniAsterisc(makeSingleIdentity("a"));}));
+	static assert(__traits(compiles, {auto engine = makeKleeneStar(makeSingleIdentity("a"));}));
 
-	auto engine = makeCliniAsterisc(makeSingleIdentity("a"));
+	auto engine = makeKleeneStar(makeSingleIdentity("a"));
 
 	size_t position;
 	OutputTerm[] output = [];
@@ -312,7 +312,7 @@ unittest
 	assert(output == []);
 
 	import terms.invariantsequence;
-	engine = makeCliniAsterisc!backward(makeGeneral!(Direction.backward)((string s) => "0" <= s && s <= "9",
+	engine = makeKleeneStar!backward(makeGeneral!(Direction.backward)((string s) => "0" <= s && s <= "9",
 	                                                                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s)));
 	position = 7;
 	output = [];
@@ -321,7 +321,7 @@ unittest
 	assert(output.charSequence == "456");
 }
 
-Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
+Engine makeKleeneStar(Direction direction = Direction.forward)(Engine engine)
 {
 	auto result = new Configurator!direction;
 	result.start = new State;
@@ -337,9 +337,9 @@ Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
 unittest
 {
 	import terms.invariantsequence;
-	auto engine = makeHitherAndThither(makeCliniAsterisc(makeGeneral((string s) => "0" <= s && s <= "9", 
+	auto engine = makeHitherAndThither(makeKleeneStar(makeGeneral((string s) => "0" <= s && s <= "9", 
 	                                                                 (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
-	                                   makeSequence!backward(makeCliniAsterisc!backward(makeGeneral!(Direction.backward)((string s) => s == "2" || s == "5",
+	                                   makeSequence!backward(makeKleeneStar!backward(makeGeneral!(Direction.backward)((string s) => s == "2" || s == "5",
 	                                                                                                                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))))),
 	                                                         makeGeneral!(Direction.backward)((string s) => true,
 	                                                                                          (string s) => cast(OutputTerm[])[] ~ new InvariantSequence("_"))));
@@ -350,7 +350,7 @@ unittest
 	assert(position == 8);
 	assert(output.charSequence == "32452552_63663");
 
-	engine = makeHitherAndThither(makeCliniAsterisc(makeGeneral((string s) => "1" <= s && s <= "9", 
+	engine = makeHitherAndThither(makeKleeneStar(makeGeneral((string s) => "1" <= s && s <= "9", 
 	                                                            (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
 	                              makeGeneral!(Direction.backward)((string s) => s == "3" || s == "6" || s == "9",
 	                                                               (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(":" ~ s)));
