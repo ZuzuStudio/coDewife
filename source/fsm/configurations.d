@@ -124,7 +124,7 @@ unittest
 	assert(output.charSequence == "бвг");
 }
 
-Engine makeSequence(Direction direction = Direction.forward)(string keyString)
+Engine makeSequence(Direction direction = forward)(string keyString)
 {
 	import terms.invariantsequence;
 	Engine[] list;
@@ -141,12 +141,12 @@ Engine makeSequence(Direction direction = Direction.forward)(string keyString)
 	return makeSequence!direction(list);
 }
 
-Engine makeSequence(Direction direction = Direction.forward)(Engine[] list...)
+Engine makeSequence(Direction direction = forward)(Engine[] list...)
 {
 	return makeSequence!direction(list);
 }
 
-Engine makeSequence(Direction direction = Direction.forward)(Engine[] list)
+Engine makeSequence(Direction direction = forward)(Engine[] list)
 {
 	auto result = new Configurator!direction;
 	result.start = new State;
@@ -232,12 +232,12 @@ unittest
 
 }
 
-Engine makeParallel(Direction direction = Direction.forward)(Engine[] list...)
+Engine makeParallel(Direction direction = forward)(Engine[] list...)
 {
 	return makeParallel!direction(list);
 }
 
-Engine makeParallel(Direction direction = Direction.forward)(Engine[] list)
+Engine makeParallel(Direction direction = forward)(Engine[] list)
 {
 	auto result = new Configurator!direction;
 	result.start = new State;
@@ -259,9 +259,10 @@ unittest
 {
 	import std.traits;
 	
-	static assert(__traits(compiles, {auto engine = makeKleeneStar(makeSingleIdentity("a"));}));
+	static assert(__traits(compiles, {auto engine = makeKleene!star(makeSingleIdentity("a"));}));
+	static assert(__traits(compiles, {auto engine = makeKleene!plus(makeSingleIdentity("a"));}));
 
-	auto engine = makeKleeneStar(makeSingleIdentity("a"));
+	auto engine = makeKleene!star(makeSingleIdentity("a"));
 
 	size_t position;
 	OutputTerm[] output = [];
@@ -311,24 +312,104 @@ unittest
 	assert(position == 0);
 	assert(output == []);
 
+	engine = makeKleene!plus(makeSingleIdentity("a"));
+
+	position = 0;
+	output = [];
+	assert(!engine.parse("",position, output));
+	assert(position == 0);
+	assert(output == []);
+	
+	position = 0;
+	output = [];
+	assert(engine.parse("a", position, output));
+	assert(position == 1);
+	assert(output.charSequence == "a");
+	
+	position = 0;
+	output = [];
+	assert(engine.parse("aa", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "aa");
+	
+	position = 0;
+	output = [];
+	assert(engine.parse("aaa", position, output));
+	assert(position == 3);
+	assert(output.charSequence == "aaa");
+	
+	position = 0;
+	output = [];
+	assert(engine.parse("aaa0", position, output));
+	assert(position == 3);
+	assert(output.charSequence == "aaa");
+	
+	position = 0;
+	output = [];
+	assert(engine.parse("aaaabaa", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "aaaa");
+	
+	position = 0; 
+	output = [];
+	assert(engine.parse("aaaaaaa", position, output));
+	assert(position == 7);
+	assert(output.charSequence == "aaaaaaa");
+	
+	position = 0;
+	output = [];
+	assert(!engine.parse("baaaaaaa", position, output));
+	assert(position == 0);
+	assert(output == []);
+
 	import terms.invariantsequence;
-	engine = makeKleeneStar!backward(makeGeneral!(Direction.backward)((string s) => "0" <= s && s <= "9",
+	engine = makeKleene!(star, backward)(makeGeneral!(Direction.backward)((string s) => "0" <= s && s <= "9",
 	                                                                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s)));
 	position = 7;
 	output = [];
 	assert(engine.parse("123a456", position, output));
 	assert(position == 4);
 	assert(output.charSequence == "456");
+
+	position = 7;
+	output = [];
+	assert(engine.parse("123a45b", position, output));
+	assert(position == 7);
+	assert(output == []);
+
+	engine = makeKleene!(plus, backward)(makeGeneral!(Direction.backward)((string s) => "0" <= s && s <= "9",
+	                                                                      (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s)));
+	position = 7;
+	output = [];
+	assert(engine.parse("123a456", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "456");
+	
+	position = 7;
+	output = [];
+	assert(!engine.parse("123a45b", position, output));
+	assert(position == 7);
+	assert(output == []);
 }
 
-Engine makeKleeneStar(Direction direction = Direction.forward)(Engine engine)
+enum KleeneKind: ubyte {star, plus};
+
+alias star = KleeneKind.star;
+alias plus = KleeneKind.plus;
+
+Engine makeKleene(KleeneKind kind, Direction direction = forward)(Engine engine)
 {
 	auto result = new Configurator!direction;
 	result.start = new State;
 	auto goodCrash = new State(good);
+	static if(kind == plus)
+		auto badCrash = new State(bad);
 	auto newState = new State;
 	result.start.addEdge(new Edge!direction(engine), newState);
-	result.start.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), goodCrash);
+	static if(kind == star)
+		result.start.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), goodCrash);
+	else
+		result.start.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), badCrash);
 	newState.addEdge(new Edge!direction(engine), newState);
 	newState.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), goodCrash);
 	return result;
@@ -337,11 +418,11 @@ Engine makeKleeneStar(Direction direction = Direction.forward)(Engine engine)
 unittest
 {
 	import terms.invariantsequence;
-	auto engine = makeHitherAndThither(makeKleeneStar(makeGeneral((string s) => "0" <= s && s <= "9", 
+	auto engine = makeHitherAndThither(makeKleene!star(makeGeneral((string s) => "0" <= s && s <= "9", 
 	                                                                 (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
-	                                   makeSequence!backward(makeKleeneStar!backward(makeGeneral!(Direction.backward)((string s) => s == "2" || s == "5",
+	                                   makeSequence!backward(makeKleene!(star, backward)(makeGeneral!(Direction.backward)((string s) => s == "2" || s == "5",
 	                                                                                                                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))))),
-	                                                         makeGeneral!(Direction.backward)((string s) => true,
+	                                                         makeGeneral!backward((string s) => true,
 	                                                                                          (string s) => cast(OutputTerm[])[] ~ new InvariantSequence("_"))));
 
 	size_t position = 0;
@@ -350,9 +431,9 @@ unittest
 	assert(position == 8);
 	assert(output.charSequence == "32452552_63663");
 
-	engine = makeHitherAndThither(makeKleeneStar(makeGeneral((string s) => "1" <= s && s <= "9", 
+	engine = makeHitherAndThither(makeKleene!star(makeGeneral((string s) => "1" <= s && s <= "9", 
 	                                                            (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
-	                              makeGeneral!(Direction.backward)((string s) => s == "3" || s == "6" || s == "9",
+	                              makeGeneral!backward((string s) => s == "3" || s == "6" || s == "9",
 	                                                               (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(":" ~ s)));
 	position = 0;
 	output = [];
@@ -364,7 +445,7 @@ unittest
 	assert(output.charSequence == "12576:6");
 }
 
-Engine makeHitherAndThither(Direction direction = Direction.forward)(Engine hither, Engine thither)
+Engine makeHitherAndThither(Direction direction = forward)(Engine hither, Engine thither)
 {
 	auto result = new Configurator!direction;
 	result.start = new State;
