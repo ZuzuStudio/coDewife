@@ -323,7 +323,6 @@ unittest
 
 Engine makeCliniAsterisc(Direction direction = Direction.forward)(Engine engine)
 {
-	enum quasi = true;
 	auto result = new Configurator!direction;
 	result.start = new State;
 	auto goodCrash = new State(good);
