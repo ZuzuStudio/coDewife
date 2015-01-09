@@ -157,10 +157,10 @@ Engine makeSequence(Direction direction = forward)(Engine[] list)
 	{
 		auto newState = new State;
 		current.addEdge(new Edge!direction(engine), newState);
-		current.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), badCrash);
+		current.addEdge(new Edge!(direction, quasi)(makeAllIdentity!direction()), badCrash);
 		current = newState;
 	}
-	current.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), goodCrash);
+	current.addEdge(new Edge!(direction,quasi)(makeAllIdentity!direction()), goodCrash);
 	return result;
 }
 
@@ -245,12 +245,12 @@ Engine makeParallel(Direction direction = forward)(Engine[] list)
 	auto badCrash = new State(bad);
 	State current = result.start;
 	auto goodState = new State;
-	goodState.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), goodCrash);
+	goodState.addEdge(new Edge!(direction, quasi)(makeAllIdentity!direction()), goodCrash);
 	foreach(engine; list)
 	{
 		current.addEdge(new Edge!direction(engine), goodState);
 	}
-	current.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), badCrash);
+	current.addEdge(new Edge!(direction,quasi)(makeAllIdentity!direction()), badCrash);
 	return result;
 }
 
@@ -407,21 +407,21 @@ Engine makeKleene(KleeneKind kind, Direction direction = forward)(Engine engine)
 	auto newState = new State;
 	result.start.addEdge(new Edge!direction(engine), newState);
 	static if(kind == star)
-		result.start.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), goodCrash);
+		result.start.addEdge(new Edge!(direction,quasi)(makeAllIdentity!direction()), goodCrash);
 	else
-		result.start.addEdge(new Edge!(direction,quasi)(makeAllIdentity()), badCrash);
+		result.start.addEdge(new Edge!(direction,quasi)(makeAllIdentity!direction()), badCrash);
 	newState.addEdge(new Edge!direction(engine), newState);
-	newState.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), goodCrash);
+	newState.addEdge(new Edge!(direction, quasi)(makeAllIdentity!direction()), goodCrash);
 	return result;
 }
 
 unittest
 {
 	import core.exception, std.traits;
-	static assert(__traits(compiles, {auto engine = makeQuantificator(makeSingleIdentity("a"), 4);}));
+	static assert(__traits(compiles, {auto engine = makeQuantifier(makeSingleIdentity("a"), 4);}));
 	try
 	{
-		auto engine = makeQuantificator(null, 4);
+		auto engine = makeQuantifier(null, 4);
 	}
 	catch(AssertError ae)
 	{
@@ -429,14 +429,14 @@ unittest
 	}
 	try
 	{
-		auto engine = makeQuantificator(makeSingleIdentity("a"), 0);
+		auto engine = makeQuantifier(makeSingleIdentity("a"), 0);
 	}
 	catch(AssertError ae)
 	{
 		assert(ae.msg == "n == 0");
 	}
 
-	auto engine = makeQuantificator(makeSingleIdentity("a"), 4);
+	auto engine = makeQuantifier(makeSingleIdentity("a"), 4);
 
 	size_t position = 0;
 	OutputTerm[] output = [];
@@ -456,7 +456,7 @@ unittest
 	assert(position == 4);
 	assert(output.charSequence == "aaaa");
 
-	engine = makeQuantificator!backward(makeSingleIdentity!backward("a"), 4);
+	engine = makeQuantifier!backward(makeSingleIdentity!backward("a"), 4);
 	position = 6;
 	output = [];
 	assert(engine.parse("dfaaaa", position, output));
@@ -476,7 +476,7 @@ unittest
 	assert(output.charSequence == "aaaa");
 }
 
-Engine makeQuantificator(Direction direction = forward)(Engine engine, size_t n)
+Engine makeQuantifier(Direction direction = forward)(Engine engine, size_t n)
 in
 {
 	assert(engine, "engine is null");
@@ -488,6 +488,192 @@ body
 	foreach(i; 0..n)
 		list ~= engine;
 	return makeSequence!direction(list);
+}
+
+unittest
+{
+	import core.exception, std.traits;
+	static assert(__traits(compiles, {auto engine = makeQuantifier(makeSingleIdentity("a"), 4, 6);}));
+	try
+	{
+		auto engine = makeQuantifier(null, 4, 7);
+	}
+	catch(AssertError ae)
+	{
+		assert(ae.msg == "engine is null");
+	}
+	try
+	{
+		auto engine = makeQuantifier(makeSingleIdentity("a"), 7, 3);
+	}
+	catch(AssertError ae)
+	{
+		assert(ae.msg == "imposible m or n");
+	}
+
+	auto engine = makeQuantifier(makeRangeIdentity("a", "e"), 4, 6);
+
+	size_t position = 0;
+	OutputTerm[] output = [];
+	assert(!engine.parse("abbfe", position, output));
+	assert(position == 0);
+	assert(output == []);
+
+	position = 0;
+	output = [];
+	assert(engine.parse("abbcfe", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "abbc");
+
+	position = 0;
+	output = [];
+	assert(engine.parse("abbcafe", position, output));
+	assert(position == 5);
+	assert(output.charSequence == "abbca");
+
+	position = 0;
+	output = [];
+	assert(engine.parse("abbcadfe", position, output));
+	assert(position == 6);
+	assert(output.charSequence == "abbcad");
+
+	position = 0;
+	output = [];
+	assert(engine.parse("abbcaddfe", position, output));
+	assert(position == 6);
+	assert(output.charSequence == "abbcad");
+
+	//TODO more unittests
+}
+
+Engine makeQuantifier(Direction direction = forward)(Engine engine, size_t m, size_t n)
+in
+{
+	assert(engine, "engine is null");
+	assert(!n || m < n, "imposible m or n");
+}
+body
+{
+	if(n)
+	{
+		if(m)
+			return makeSequence!direction(makeQuantifier!direction(engine, m), makeNoMoreThan!direction(engine, n - m));
+		else
+			return makeNoMoreThan!direction(engine, n);
+	}
+	else
+	{
+		if(m)
+			return makeSequence!direction(makeQuantifier!direction(engine, m), makeKleene!star(engine));
+		else
+			return makeKleene!star(engine);
+	}
+}
+
+unittest
+{
+	import core.exception, std.traits;
+	static assert(__traits(compiles, {auto engine = makeNoMoreThan(makeSingleIdentity("a"), 3);}));
+	try
+	{
+		auto engine = makeNoMoreThan(null, 3);
+	}
+	catch(AssertError ae)
+	{
+		assert(ae.msg == "engine is null");
+	}
+	try
+	{
+		auto engine = makeNoMoreThan(makeSingleIdentity("a"), 0);
+	}
+	catch(AssertError ae)
+	{
+		assert(ae.msg == "n == 0");
+	}
+
+	auto engine = makeNoMoreThan(makeSingleIdentity("a"), 3);
+	size_t position = 0;
+	OutputTerm[] output = [];
+	assert(engine.parse("bbbbb", position, output));
+	assert(position == 0);
+	assert(output == []);
+
+	assert(engine.parse("abbbb", position, output));
+	assert(position == 1);
+	assert(output.charSequence == "a");
+
+	position = 0;
+	output = [];
+	assert(engine.parse("aabbb", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "aa");
+
+	position = 0;
+	output = [];
+	assert(engine.parse("aaabb", position, output));
+	assert(position == 3);
+	assert(output.charSequence == "aaa");
+
+	position = 0;
+	output = [];
+	assert(engine.parse("aaaab", position, output));
+	assert(position == 3);
+	assert(output.charSequence == "aaa");
+
+	engine = makeNoMoreThan!backward(makeParallel!backward(makeSingleIdentity!backward("a"), makeSingleIdentity!backward("c")), 3);
+
+	position = 5;
+	output = [];
+	assert(engine.parse("bbbbb", position, output));
+	assert(position == 5);
+	assert(output == []);
+
+	position = 5;
+	output = [];
+	assert(engine.parse("bbbba", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "a");
+
+	position = 5;
+	output = [];
+	assert(engine.parse("bbbca", position, output));
+	assert(position == 3);
+	assert(output.charSequence == "ca");
+
+	position = 5;
+	output = [];
+	assert(engine.parse("bbcca", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "cca");
+
+	position = 5;
+	output = [];
+	assert(engine.parse("bccca", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "cca");
+}
+
+private Engine makeNoMoreThan(Direction direction = forward)(Engine engine, size_t n)
+in
+{
+	assert(engine, "engine is null");
+	assert(n != 0, "n == 0");
+}
+body
+{
+	auto result = new Configurator!direction;
+	result.start = new State;
+	auto goodCrash = new State(good);
+	State current = result.start;
+	foreach(i; 0..n)
+	{
+		auto newState = new State;
+		current.addEdge(new Edge!direction(engine), newState);
+		current.addEdge(new Edge!(direction, quasi)(makeAllIdentity!direction()), goodCrash);
+		current = newState;
+	}
+	current.addEdge(new Edge!(direction,quasi)(makeAllIdentity!direction()), goodCrash);
+	return result;
 }
 
 unittest
@@ -522,6 +708,11 @@ unittest
 
 Engine makeHitherAndThither(Direction direction = forward)(Engine hither, Engine thither)
 {
+	static if(direction == forward)
+		enum contrdirection = backward;
+	else
+		enum contrdirection = forward;
+
 	auto result = new Configurator!direction;
 	result.start = new State;
 	auto goodCrash = new State(good);
@@ -530,10 +721,10 @@ Engine makeHitherAndThither(Direction direction = forward)(Engine hither, Engine
 	auto newState = new State;
 
 	result.start.addEdge(new Edge!direction(hither), newState);
-	result.start.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), badCrash);
+	result.start.addEdge(new Edge!(direction, quasi)(makeAllIdentity!direction()), badCrash);
 
 	newState.addEdge(new Edge!(direction, reverse)(thither), goodCrash);
-	newState.addEdge(new Edge!(direction, quasi)(makeAllIdentity()), badCrash);
+	newState.addEdge(new Edge!(direction, quasi)(makeAllIdentity!contrdirection()), badCrash);
 
 	return result;
 }
