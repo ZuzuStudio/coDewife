@@ -417,6 +417,81 @@ Engine makeKleene(KleeneKind kind, Direction direction = forward)(Engine engine)
 
 unittest
 {
+	import core.exception, std.traits;
+	static assert(__traits(compiles, {auto engine = makeQuantificator(makeSingleIdentity("a"), 4);}));
+	try
+	{
+		auto engine = makeQuantificator(null, 4);
+	}
+	catch(AssertError ae)
+	{
+		assert(ae.msg == "engine is null");
+	}
+	try
+	{
+		auto engine = makeQuantificator(makeSingleIdentity("a"), 0);
+	}
+	catch(AssertError ae)
+	{
+		assert(ae.msg == "n == 0");
+	}
+
+	auto engine = makeQuantificator(makeSingleIdentity("a"), 4);
+
+	size_t position = 0;
+	OutputTerm[] output = [];
+	assert(engine.parse("aaaadf", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "aaaa");
+
+	position = 0;
+	output = [];
+	assert(!engine.parse("aaadf", position, output));
+	assert(position == 0);
+	assert(output == []);
+
+	position = 0;
+	output = [];
+	assert(engine.parse("aaaaadf", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "aaaa");
+
+	engine = makeQuantificator!backward(makeSingleIdentity!backward("a"), 4);
+	position = 6;
+	output = [];
+	assert(engine.parse("dfaaaa", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "aaaa");
+
+	position = 5;
+	output = [];
+	assert(!engine.parse("dfaaa", position, output));
+	assert(position == 5);
+	assert(output == []);
+
+	position = 6;
+	output = [];
+	assert(engine.parse("daaaaa", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "aaaa");
+}
+
+Engine makeQuantificator(Direction direction = forward)(Engine engine, size_t n)
+in
+{
+	assert(engine, "engine is null");
+	assert(n != 0, "n == 0");
+}
+body
+{
+	Engine[] list;
+	foreach(i; 0..n)
+		list ~= engine;
+	return makeSequence!direction(list);
+}
+
+unittest
+{
 	import terms.invariantsequence;
 	auto engine = makeHitherAndThither(makeKleene!star(makeGeneral((string s) => "0" <= s && s <= "9", 
 	                                                                 (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
