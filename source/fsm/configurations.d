@@ -543,7 +543,80 @@ unittest
 	assert(position == 6);
 	assert(output.charSequence == "abbcad");
 
-	//TODO more unittests
+
+
+	engine = makeQuantifier(makeRangeIdentity("a", "d"), 0, 3);
+	position = 0;
+	output = [];
+	assert(engine.parse("abba", position, output));
+	assert(position == 3);
+	assert(output.charSequence == "abb");
+
+	position = 0;
+	output = [];
+	assert(engine.parse("ac/dc", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "ac");
+
+	position = 0;
+	output = [];
+	assert(engine.parse("zuzu", position, output));
+	assert(position == 0);
+	assert(output == []);
+
+
+
+	engine = makeQuantifier(makeRangeIdentity("a", "d"), 2, 0);
+	position = 0;
+	output = [];
+	assert(engine.parse("abba", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "abba");
+	
+	position = 0;
+	output = [];
+	assert(engine.parse("ac/dc", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "ac");
+	
+	position = 0;
+	output = [];
+	assert(!engine.parse("zuzu", position, output));
+	assert(position == 0);
+	assert(output == []);
+
+	position = 0;
+	output = [];
+	assert(!engine.parse("azkaban", position, output));
+	assert(position == 0);
+	assert(output == []);
+
+
+
+	engine = makeQuantifier(makeRangeIdentity("a", "d"), 0, 0);
+	position = 0;
+	output = [];
+	assert(engine.parse("abba", position, output));
+	assert(position == 4);
+	assert(output.charSequence == "abba");
+	
+	position = 0;
+	output = [];
+	assert(engine.parse("ac/dc", position, output));
+	assert(position == 2);
+	assert(output.charSequence == "ac");
+	
+	position = 0;
+	output = [];
+	assert(engine.parse("zuzu", position, output));
+	assert(position == 0);
+	assert(output == []);
+	
+	position = 0;
+	output = [];
+	assert(engine.parse("azkaban", position, output));
+	assert(position == 1);
+	assert(output.charSequence == "a");
 }
 
 Engine makeQuantifier(Direction direction = forward)(Engine engine, size_t m, size_t n)
