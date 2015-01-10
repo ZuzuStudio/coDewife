@@ -18,8 +18,17 @@
 		},
 		{
 			"name": "intliteral",
-			"sourcePath": "skapp/intliteral",
+			"sourcePath": "skapp/intliteral/test",
 			"targetType": "executable",
+			"targetName": "testIntliteral",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "benchIntliteral",
+			"sourcePath": "skapp/intliteral/bench",
+			"targetType": "executable",
+			"targetName": "benchIntliteral",
 			"targetPath": "build/skapp",
 			"workingDirectory": "build/skapp" 
 		}
