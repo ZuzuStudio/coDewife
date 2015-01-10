@@ -1,8 +1,8 @@
 module fsm.configurations;
 
 import std.conv;
-import fsm.common;
-import fsm.elementar;
+public import fsm.common;
+public import fsm.elementar;
 
 // MAYBE private
 final class Configurator(Direction direction): Engine

@@ -16,6 +16,11 @@ template isOutputTerm(T)
 interface OutputTerm
 {
 	string charSequence()@property;
+
+	debug
+	{
+		string id()@property;
+	}
 }
 
 version(unittest)

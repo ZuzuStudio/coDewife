@@ -27,6 +27,14 @@ public:
 		return sequence;
 	}
 
+	debug
+	{
+		override string id()@property
+		{
+			return "IS";
+		}
+	}
+
 private:
 	string sequence;
 }
