@@ -4,47 +4,33 @@ import fsm.common;
 import terms.invariantsequence;
 import std.conv;
 
-final class Elementar(Direction direction): Engine
+final class Elementar(Direction direction, bool isAllIdentity = false): Engine
 {
 public:
-	bool key; // !!! IT SHOULD BE REMOVED
 
 	this(bool delegate(string) predicate , OutputTerm[] delegate(string) mapping)
 	{
 		this.predicate = predicate;
 		this.mapping = mapping;
-
-		key = false; // !!! IT SHOULD BE REMOVED
 	}
-	
+
 	override bool parse(string text, ref size_t position, ref OutputTerm[] output)
 	{
-		if (!key) // !!! IT SHOULD BE REMOVED
+		size_t index = position;
+
+		if(isOverboard!direction(index, text.length))
+			return isAllIdentity;
+
+		auto symbol = to!string(decode!direction(text, index));
+
+		auto result = predicate(symbol);
+
+		if(isAllIdentity || result)
 		{
-			size_t index = position;
-
-			if(isOverboard!direction(index, text.length))
-					return false;
-
-			auto symbol = to!string(decode!direction(text, index));
-
-			auto result = predicate(symbol);
-			if(result)
-			{
-				position = index;
-				glue!direction(output, mapping(symbol));
-			}
-			return result;
-		} else                                                    // !!! IT SHOULD BE REMOVED
-		{
-			if(position >= text.length)                           //
-				return true;                                      //
-			size_t index = position;                              //
-			auto symbol = to!string(decode(text, index));         //
-			position = index;                                     //
-			output ~= new InvariantSequence(symbol);              //
-			return true;
+			position = index;
+			glue!direction(output, mapping(symbol));
 		}
+		return isAllIdentity || result;
 	}
 	
 private:
@@ -203,16 +189,15 @@ unittest
 
 Engine makeAllIdentity(Direction direction = forward)()
 {
-	auto obj = new Elementar!direction(delegate (string s) => true, delegate (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
-
-	obj.key = true;
-	return obj;
+	return new Elementar!(direction, true)(delegate (string s) => true, 
+	                                       delegate (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
 }
 
 unittest
 {
 	import terms.underscore, terms.invariantsequence;
-	auto engine = makeGeneral((string s) => s == "_", (string s) => cast(OutputTerm[])[] ~ new UserUnderscore);
+	auto engine = makeGeneral((string s) => s == "_", 
+	                          (string s) => cast(OutputTerm[])[] ~ new UserUnderscore);
 
 	size_t position;
 	OutputTerm[] output = [];
@@ -254,7 +239,8 @@ unittest
 unittest
 {
 	import terms.underscore, terms.invariantsequence;
-	auto engine = makeGeneral!backward((string s) => "0" <= s && s <= "9", (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new LogicalUnderscore);
+	auto engine = makeGeneral!backward((string s) => "0" <= s && s <= "9", 
+	                                   (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new LogicalUnderscore);
 	
 	size_t position = 4;
 	OutputTerm[] output = [];
@@ -288,7 +274,7 @@ unittest
 	assert(output == []);
 	
 	engine = makeGeneral!backward((string s) => true,
-	                             (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))));
+	                              (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))));
 	position = 0;
 	output = [];
 	assert(!engine.parse("Я", position, output));
