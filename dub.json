@@ -15,6 +15,13 @@
 			"targetType": "executable",
 			"targetPath": "build/app",
 			"workingDirectory": "build/app"
+		},
+		{
+			"name": "intliteral",
+			"sourcePath": "skapp/intliteral",
+			"targetType": "executable",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
 		}
 	]
 }
