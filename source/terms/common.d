@@ -23,13 +23,10 @@ interface OutputTerm
 	}
 }
 
-version(unittest)
+string charSequence(OutputTerm[] terms)
 {
-	string charSequence(OutputTerm[] terms)
-	{
 		typeof(return) result;
 		foreach(term; terms)
 			result ~= term.charSequence;
 		return result;
-	}
 }

@@ -26,7 +26,7 @@
 		},
 		{
 			"name": "benchIntliteral",
-			"sourcePath": "skapp/intliteral/bench",
+			"sourcePath": "skapp/intliteral/benchmark",
 			"targetType": "executable",
 			"targetName": "benchIntliteral",
 			"targetPath": "build/skapp",
