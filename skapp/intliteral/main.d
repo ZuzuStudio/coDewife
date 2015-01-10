@@ -1,61 +1,79 @@
 module main;
 
-import  
-	std.stdio,
-	std.string,
-	//fsm.global,
-	terms.underscore;
+import  std.stdio;
 
-import fsm.configurations, fsm.elementar;
+import	terms.underscore;
+import	fsm.configurations;
 
 void main()
 {
-	/+Engine[] steam_engine;
-	steam_engine~=new DigitLiteral;
-	steam_engine~=new SimpleReplace("#");
+	Engine[] steam_engine;
+	steam_engine ~= makeDigitalLiteral();
+	steam_engine ~= makeAllIdentity();
 
 	auto line = readln();
+	line = line[0..$-1];
 	OutputTerm[] terms;
-	do
+	size_t position=0;
+	while(position < line.length)
 	{
-		terms ~= steam_engine[0].parse(line);
-		terms ~= steam_engine[1].parse(line);
-	}while(line.length);
+		if(steam_engine[0].parse(line, position, terms))
+		  continue;
+		steam_engine[1].parse(line, position, terms);
+	}
 
 	writeln("============= No Underscore ================");
 	LogicalUnderscore.printable = false;
 	UserUnderscore.printable = false;
 	CommonUnderscore.printable = false;
-	foreach(term; terms)
-	{
-		write(term.charSequence);
-	}
+	terms.output();
 	writeln("\n============================================");
 	writeln("============= User Underscore ==============");
 	LogicalUnderscore.printable = false;
 	UserUnderscore.printable = true;
 	CommonUnderscore.printable = true;
-	foreach(term; terms)
-	{
-		write(term.charSequence);
-	}
+	terms.output();
 	writeln("\n============================================");
 	writeln("============= Logical Underscore ===========");
 	LogicalUnderscore.printable = true;
 	UserUnderscore.printable = false;
 	CommonUnderscore.printable = true;
+	terms.output();
+	writeln("\n============================================");
+	writeln("============= Common Underscore ============");
+	LogicalUnderscore.printable = false;
+	UserUnderscore.printable = false;
+	CommonUnderscore.printable = true;
+	terms.output();
+	writeln("\n============================================");
+	readln();
+}
+
+Engine makeDigitalLiteral()
+{
+  import terms.invariantsequence;
+  Engine[string] table;
+  table["ForwardDigit"] = makeGeneral((string s) => "0" <= s && s <= "9",
+                                      (string s) => cast(OutputTerm[])[]);
+  return makeGeneral((string s) => "0" <= s && s <= "9",
+                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence("*" ~ s));
+}
+
+void output(OutputTerm[] terms)
+{
 	foreach(term; terms)
 	{
 		write(term.charSequence);
 	}
-	writeln("\n============================================");
-	writeln("============= User Underscore ==============");
-	LogicalUnderscore.printable = false;
-	UserUnderscore.printable = false;
-	CommonUnderscore.printable = true;
+	writeln("\n");
 	foreach(term; terms)
 	{
-		writeln(term.charSequence);
+		writef("%2s ", term.charSequence);
 	}
-	writeln("\n============================================");+/
+	writeln();
+	foreach(term; terms)
+	{
+		write(term.id,":");
+	}
+	writeln();
 }

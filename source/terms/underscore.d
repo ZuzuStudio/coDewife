@@ -19,6 +19,14 @@ final class UserUnderscore: OutputTerm
 	}
 
 	mixin MixImplementation!();
+
+	debug
+	{
+		override string id()@property
+		{
+			return "UU";
+		}
+	}
 }
 
 unittest
@@ -38,6 +46,14 @@ final class CommonUnderscore: OutputTerm
 	}
 
 	mixin MixImplementation!();
+
+	debug
+	{
+		override string id()@property
+		{
+			return "CU";
+		}
+	}
 }
 
 unittest
@@ -57,6 +73,36 @@ final class LogicalUnderscore: OutputTerm
 	}
 
 	mixin MixImplementation!();
+
+	debug
+	{
+		override string id()@property
+		{
+			return "LU";
+		}
+	}
+}
+
+final class LastUnderscore: OutputTerm
+{
+	unittest
+	{
+		auto xu = new LastUnderscore;
+		LastUnderscore.printable = true;
+		assert("_" == xu.charSequence);
+		LastUnderscore.printable = false;
+		assert("" == xu.charSequence);
+	}
+	
+	mixin MixImplementation!();
+	
+	debug
+	{
+		override string id()@property
+		{
+			return "XU";
+		}
+	}
 }
 
 private mixin template MixImplementation()
