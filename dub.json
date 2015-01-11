@@ -31,6 +31,22 @@
 			"targetName": "benchIntliteral",
 			"targetPath": "build/skapp",
 			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "identifier",
+			"sourcePath": "skapp/identifier/test",
+			"targetType": "executable",
+			"targetName": "testIdentifier",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "benchIdentifier",
+			"sourcePath": "skapp/identifier/benchmark",
+			"targetType": "executable",
+			"targetName": "benchIdentifier",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
 		}
 	]
 }
