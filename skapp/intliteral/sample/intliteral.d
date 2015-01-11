@@ -2,10 +2,10 @@ module sample.intliteral;
 
 import terms.underscore;
 import fsm.configurations;
+import terms.invariantsequence;
 
 Engine makeDigitalLiteral()
 {
-  import terms.invariantsequence;
   Engine[string] table;
   table["ForwardDigit"] = makeGeneral((string s) => "0" <= s && s <= "9",
                                       (string s) => cast(OutputTerm[])[]);
@@ -27,7 +27,6 @@ Engine makeDigitalLiteral()
                                                                                       makeKleene!(star, backward)(table["UU"]),
                                                                                       table["BackwardDigit"]),
                                                                 table["BackwardLUDigit"]));
-                                                                              
   table["ForwardIntLiteral"] = makeSequence(table["ForwardDigit"],
                                             makeKleene!star(makeParallel(table["ForwardDigit"],
                                                                          table["ForwardUnderscore"])));
@@ -37,4 +36,10 @@ Engine makeDigitalLiteral()
                                                       makeQuantifier!backward(table["UU*D"], 0, 2));
   table["IntLiteral"] = makeHitherAndThither(table["ForwardIntLiteral"], table["BackwardIntLiteral"]);
   return table["IntLiteral"];
+}
+
+Engine makeSymbolIdentity()
+{
+	return makeGeneral((string s) => true,
+					   (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
 }

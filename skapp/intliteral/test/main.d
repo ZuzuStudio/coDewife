@@ -8,20 +8,14 @@ import 	sample.intliteral;
 
 void main()
 {
-	Engine[] steam_engine;
-	steam_engine ~= makeDigitalLiteral();
-	steam_engine ~= makeAllIdentity();
+	auto engine = makeParallel(makeDigitalLiteral(), makeSymbolIdentity());
 
 	auto line = readln();
 	line = line[0..$-1];
 	OutputTerm[] terms;
 	size_t position=0;
-	while(position < line.length)
-	{
-		if(steam_engine[0].parse(line, position, terms))
-		  continue;
-		steam_engine[1].parse(line, position, terms);
-	}
+	while(engine.parse(line, position, terms))
+	{}
 
 	writeln("============= No Underscore ================");
 	LogicalUnderscore.printable = false;
