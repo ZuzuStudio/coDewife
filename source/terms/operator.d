@@ -47,3 +47,49 @@ public:
 private:
 	string opString;
 }
+
+unittest
+{
+	assert(isOutputTerm!UnaryOperator);
+}
+
+final class UnaryOperator: OutputTerm
+{
+public:
+	static bool padding;
+
+	this(string opString)
+	{
+		this.opString = opString;
+	}
+
+	unittest
+	{
+		auto uo = new UnaryOperator("&");
+		UnaryOperator.padding = true;
+		assert(uo.charSequence == " &");
+		UnaryOperator.padding = false;
+		assert(uo.charSequence == "&");
+	}
+
+	override string charSequence()@property
+	{
+		string result;
+		if(padding)
+			result = " " ~ opString;
+		else
+			result = opString;
+		return result;
+	}
+	
+	debug
+	{
+		override string id()@property
+		{
+			return "UO";
+		}
+	}
+
+private:
+	string opString;
+}
