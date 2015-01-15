@@ -7,6 +7,9 @@ import terms.invariantsequence;
 Engine makeDigitalLiteral()
 {
 	Engine[string] table;
+	table["BinaryPrefix"] = makeSequence(makeSingleIdentity("0"),
+	                                     makeParallel(makeSingleIdentity("b"),
+	                                                  makeSingleIdentity("B")));
 	table["ForwardDigit"] = makeGeneral((string s) => "0" <= s && s <= "9",
 	                                    (string s) => cast(OutputTerm[])[]);
 	table["ForwardUnderscore"] = makeGeneral((string s) => s == "_",
