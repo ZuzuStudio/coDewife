@@ -1,10 +1,10 @@
 module sample.identifier;
 
+import terms.invariantsequence;
 import fsm.configurations;
 
 Engine makeIdentifier()
 {
-  import terms.invariantsequence;
   Engine[string] table;
   table["_"] = makeSingleIdentity("_");
   table["Letter"] = makeGeneral((string s) => ("a" <= s && s <= "z") || ("A" <= s && s <= "Z"),
