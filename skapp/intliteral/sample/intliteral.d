@@ -10,6 +10,8 @@ Engine makeDigitalLiteral()
 	table["BinaryPrefix"] = makeSequence(makeSingleIdentity("0"),
 	                                     makeParallel(makeSingleIdentity("b"),
 	                                                  makeSingleIdentity("B")));
+	table["ForwardBinaryDigit"] = makeGeneral((string s) => s == "0" || s == "1",
+	                                            (string s) => cast(OutputTerm[])[]);
 	table["ForwardDigit"] = makeGeneral((string s) => "0" <= s && s <= "9",
 	                                    (string s) => cast(OutputTerm[])[]);
 	table["ForwardUnderscore"] = makeGeneral((string s) => s == "_",
