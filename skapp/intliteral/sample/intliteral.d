@@ -11,7 +11,7 @@ Engine makeDigitalLiteral()
 	                                     makeParallel(makeSingleIdentity("b"),
 	                                                  makeSingleIdentity("B")));
 	table["ForwardBinaryDigit"] = makeGeneral((string s) => s == "0" || s == "1",
-	                                            (string s) => cast(OutputTerm[])[]);
+	                                          (string s) => cast(OutputTerm[])[]);
 	table["ForwardDigit"] = makeGeneral((string s) => "0" <= s && s <= "9",
 	                                    (string s) => cast(OutputTerm[])[]);
 	table["ForwardUnderscore"] = makeGeneral((string s) => s == "_",
@@ -34,10 +34,10 @@ Engine makeDigitalLiteral()
 	                                                                                    makeKleene!(star, backward)(table["UU"]),
 	                                                                                    table["BackwardDigit"]),
 	                                                              table["BackwardLUDigit"]));
-	table["ForwardIntLiteral"] = makeSequence(table["ForwardDigit"],
+	table["ForwardDecimalLiteral"] = makeSequence(table["ForwardDigit"],
 	                                          makeKleene!star(makeParallel(table["ForwardDigit"],
 	                                                                       table["ForwardUnderscore"])));
-	table["BackwardIntLiteral"] = makeSequence!backward(makeKleene!(star, backward)(table["XU"]),
+	table["BackwardDecimalLiteral"] = makeSequence!backward(makeKleene!(star, backward)(table["XU"]),
 	                                                    table["BackwardDigit"],
 	                                                    makeKleene!(star, backward)(table["Period"]),
 	                                                    makeQuantifier!backward(table["UU*D"], 0, 2));
@@ -48,8 +48,8 @@ Engine makeDigitalLiteral()
 	                                      makeSequence("L"),
 	                                      makeSequence("u"),
 	                                      makeSequence("U"));
-	table["Integer"] = makeHitherAndThither(table["ForwardIntLiteral"], table["BackwardIntLiteral"]);
-	table["IntLiteral"] = makeSequence(table["Integer"], makeQuantifier(table["IntegerSuffix"], 0, 1));
+	table["DecimalInteger"] = makeHitherAndThither(table["ForwardDecimalLiteral"], table["BackwardDecimalLiteral"]);
+	table["IntLiteral"] = makeSequence(table["DecimalInteger"], makeQuantifier(table["IntegerSuffix"], 0, 1));
 	return table["IntLiteral"];
 }
 
