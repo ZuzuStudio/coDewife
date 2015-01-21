@@ -9,7 +9,7 @@ void main()
 {
 	Engine[] steam_engine;
 	steam_engine ~= makeCharLiteral();
-	steam_engine ~= makeAllIdentity();
+	steam_engine ~= makeHungryMachine();
 	
 	auto line = readln();
 	line = line[0..$-1];
