@@ -22,7 +22,7 @@ void main()
 		steam_engine[1].parse(line, position, terms);
 	}
 
-	writeln("============= IDENTIFIER TEST ==============");
+	writeln("============= CHARLITERAL TEST =============");
 	terms.output();
 	writeln("\n============================================");
 }

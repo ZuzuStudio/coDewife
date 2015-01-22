@@ -64,10 +64,10 @@ unittest
 	output = null;
 }
 
-Engine makeSingleIdentity(Direction direction = forward)(string symbol)
+Engine makeSingleIdentity(Direction direction = forward, OutputType = InvariantSequence)(string symbol)
 {
 	return new Elementar!direction(delegate (string s) => s == symbol,
-	                               delegate (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
+	                               delegate (string s) => cast(OutputTerm[])[] ~ new OutputType(s));
 }
 
 unittest
@@ -131,10 +131,10 @@ unittest
 	assert(output.charSequence == "ар");
 }
 
-Engine makeRangeIdentity(Direction direction = forward)(string down, string up)
+Engine makeRangeIdentity(Direction direction = forward, OutputType = InvariantSequence)(string down, string up)
 {
 	return new Elementar!direction(delegate (string s) => down <= s && s <= up,
-	                               delegate (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
+	                               delegate (string s) => cast(OutputTerm[])[] ~ new OutputType(s));
 }
 
 unittest
@@ -187,10 +187,10 @@ unittest
 	+/
 }
 
-Engine makeAllIdentity(Direction direction = forward)()
+Engine makeAllIdentity(Direction direction = forward, OutputType = InvariantSequence)()
 {
 	return new Elementar!(direction, true)(delegate (string s) => true, 
-	                                       delegate (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
+	                                       delegate (string s) => cast(OutputTerm[])[] ~ new OutputType(s));
 }
 
 unittest

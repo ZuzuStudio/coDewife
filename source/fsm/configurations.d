@@ -3,6 +3,7 @@ module fsm.configurations;
 import std.conv;
 public import fsm.common;
 public import fsm.elementar;
+public import terms.invariantsequence;
 
 // MAYBE private
 final class Configurator(Direction direction): Engine
@@ -124,18 +125,18 @@ unittest
 	assert(output.charSequence == "бвг");
 }
 
-Engine makeSequence(Direction direction = forward)(string keyString)
+Engine makeSequence(Direction direction = forward, OutputType = InvariantSequence)(string keyString)
 {
 	import terms.invariantsequence;
 	Engine[] list;
 	foreach(dchar symbol; keyString)
 	{
 		static if(direction == forward)
-			list ~= makeSingleIdentity(to!string(symbol));
+			list ~= makeSingleIdentity!(forward, OutputType)(to!string(symbol));
 		else
 		{
 			list ~= makeGeneral!(Direction.backward)((string s) => s == to!string(symbol),
-			                                         (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));	
+			                                         (string s) => cast(OutputTerm[])[] ~ new OutputType(s));	
 		}
 	}
 	return makeSequence!direction(list);
