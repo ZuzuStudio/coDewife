@@ -63,6 +63,22 @@
 			"targetName": "benchCharliteral",
 			"targetPath": "build/skapp",
 			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "keyword",
+			"sourcePath": "skapp/keyword/test",
+			"targetType": "executable",
+			"targetName": "testKeyword",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "benchKeyword",
+			"sourcePath": "skapp/keyword/benchmark",
+			"targetType": "executable",
+			"targetName": "benchKeyword",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
 		}
 	]
 }

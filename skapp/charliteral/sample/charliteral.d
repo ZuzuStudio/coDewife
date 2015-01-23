@@ -14,17 +14,13 @@ Engine makeCharLiteral()
 {
   Engine[string] table;
   table["Character"] = makeAllIdentity!(forward, CharLiteral)();
-  
   table["HexLetter"] = makeGeneral((string s) => (("a" <= s && s <= "f") || ("A" <= s && s <= "F") || s == "_"),
                                    (string s) => cast(OutputTerm[])[] ~ new CharLiteral(s));
   table["OctalDigit"] = makeGeneral((string s) => (("0" <= s && s <= "7") || s == "_"),
                                     (string s) => cast(OutputTerm[])[] ~ new CharLiteral(s));
   table["DecimalDigit"] = makeRangeIdentity!(forward, CharLiteral)("0", "9");
-  //table["DecimalDigit"] = makeGeneral((string s) => ("0" <= s && s <= "9"),
-  //                                    (string s) => cast(OutputTerm[])[] ~ new CharLiteral(s));
   table["HexDigit"] = makeParallel(table["DecimalDigit"],
                                    table["HexLetter"]);
-  
   table["EscapeSequence"] = makeParallel(makeSequence!(forward, CharLiteral)(`\'`),
                                          makeSequence!(forward, CharLiteral)(`\"`),
                                          makeSequence!(forward, CharLiteral)(`\?`),
@@ -45,10 +41,7 @@ Engine makeCharLiteral()
                                          makeSequence(makeSequence!(forward, CharLiteral)(`\U`), table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"]),);
   table["SingleQuotedCharacter"] = makeParallel(table["EscapeSequence"],
                                                 table["Character"]);
-  
   table["SingleQuote"] = makeSingleIdentity!(forward, SingleQuote)("'");
-  //table["SingleQuote"] = makeGeneral((string s) => s == "'",
-  //                                   (string s) => cast(OutputTerm[])[] ~ new SingleQuote(s));
   table["CharLiteral"] = makeSequence(table["SingleQuote"],
                                       table["SingleQuotedCharacter"],
                                       table["SingleQuote"]);

@@ -39,3 +39,43 @@ private:
 	string sequence;
 }
 
+unittest
+{
+	assert(isOutputTerm!Unknown);
+}
+
+final class Unknown: OutputTerm
+{
+public:
+	this(string opString)
+	{
+		this.opString = opString;
+	}
+
+	unittest
+	{
+		auto cl = new Unknown("a");
+		assert(cl.charSequence == "a");
+		cl = new Unknown(`\t`);
+		assert(cl.charSequence == `\t`);
+	}
+
+	override string charSequence()@property
+	{
+		string result;
+		result = opString;
+		return result;
+	}
+	
+	debug
+	{
+		override string id()@property
+		{
+			return "UK";
+		}
+	}
+
+private:
+	string opString;
+} 
+
