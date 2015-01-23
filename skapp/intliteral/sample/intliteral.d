@@ -15,12 +15,12 @@ Engine makeDigitalLiteral()
 	table["BackwardBinaryDigit"] = makeRangeIdentity!backward("0", "1");
 	table["BackwardLUBinaryDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "1",
 	                                                      (string s) => cast(OutputTerm[])[]
-	                                                                    ~ new InvariantSequence(s),
+	                                                                    ~ new InvariantSequence(s)
 	                                                                    ~ new LogicalUnderscore);
 	table["BackwardLUBinaryDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "1",
 	                                                      (string s) => cast(OutputTerm[])[]
-	                                                                    ~ new InvariantSequence(s),
-	                                                                    ~ new LogicalUnderscore,
+	                                                                    ~ new InvariantSequence(s)
+	                                                                    ~ new LogicalUnderscore
 	                                                                    ~ new LogicalUnderscore);
 	table["ForwardDecimalDigit"] = makeGeneral((string s) => "0" <= s && s <= "9",
 	                                           (string s) => cast(OutputTerm[])[]);
