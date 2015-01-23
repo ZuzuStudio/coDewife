@@ -17,11 +17,11 @@ Engine makeDigitalLiteral()
 	                                                      (string s) => cast(OutputTerm[])[]
 	                                                                    ~ new InvariantSequence(s)
 	                                                                    ~ new LogicalUnderscore);
-	table["BackwardLUBinaryDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "1",
-	                                                      (string s) => cast(OutputTerm[])[]
-	                                                                    ~ new InvariantSequence(s)
-	                                                                    ~ new LogicalUnderscore
-	                                                                    ~ new LogicalUnderscore);
+	table["BackwardLULUBinaryDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "1",
+	                                                        (string s) => cast(OutputTerm[])[]
+	                                                                      ~ new InvariantSequence(s)
+	                                                                      ~ new LogicalUnderscore
+	                                                                      ~ new LogicalUnderscore);
 	table["ForwardDecimalDigit"] = makeGeneral((string s) => "0" <= s && s <= "9",
 	                                           (string s) => cast(OutputTerm[])[]);
 	table["ForwardUnderscore"] = makeGeneral((string s) => s == "_",
@@ -29,28 +29,42 @@ Engine makeDigitalLiteral()
 	table["BackwardDecimalDigit"] = makeRangeIdentity!backward("0", "9");
 	table["BackwardLUDecimalDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "9",
 	                                                       (string s) => cast(OutputTerm[])[]
-	                                                                   ~ new InvariantSequence(s)
-	                                                                   ~ new LogicalUnderscore);
+	                                                                     ~ new InvariantSequence(s)
+	                                                                     ~ new LogicalUnderscore);
 	table["XU"] = makeGeneral!backward((string s) => s == "_",
 	                                   (string s) => cast(OutputTerm[])[] ~ new LastUnderscore);
 	table["CU"] = makeGeneral!backward((string s) => s == "_",
 	                                   (string s) => cast(OutputTerm[])[] ~ new CommonUnderscore);
 	table["UU"] = makeGeneral!backward((string s) => s == "_",
 	                                   (string s) => cast(OutputTerm[])[] ~ new UserUnderscore);
+	table["UU*B"] = makeSequence!backward(makeKleene!(star, backward)(table["UU"]),
+	                                      table["BackwardBinaryDigit"]);
 	table["UU*D"] = makeSequence!backward(makeKleene!(star, backward)(table["UU"]),
 	                                      table["BackwardDecimalDigit"]);
-	table["Period"] = makeSequence!backward(makeQuantifier!backward(table["UU*D"], 2),
-	                                        makeParallel!backward(makeSequence!backward(table["CU"],
-	                                                                                    makeKleene!(star, backward)(table["UU"]),
-	                                                                                    table["BackwardDecimalDigit"]),
-	                                                              table["BackwardLUDecimalDigit"]));
+	table["BinaryPeriod"] = makeSequence!backward(makeQuantifier!backward(table["UU*B"], 3),
+	                                              makeParallel!backward(makeSequence!backward(table["CU"],
+	                                                                                          makeKleene!(star, backward)(table["UU"]),
+	                                                                                          table["BackwardBinaryDigit"]),
+	                                                                    table["BackwardLUBinaryDigit"]));
+	table["DecimalPeriod"] = makeSequence!backward(makeQuantifier!backward(table["UU*D"], 2),
+	                                               makeParallel!backward(makeSequence!backward(table["CU"],
+	                                                                                           makeKleene!(star, backward)(table["UU"]),
+	                                                                                           table["BackwardDecimalDigit"]),
+	                                                                     table["BackwardLUDecimalDigit"]));
+	table["ForwardBinaryLiteral"] = makeSequence(table["BinaryPrefix"],
+	                                             makeKleene!star(makeParallel(table["ForwardBinaryDigit"],
+	                                                                          table["ForwardUnderscore"])));
+	table["BackwardBinaryLiteral"] = makeSequence!backward(makeKleene!(star, backward)(table["XU"]),
+	                                                       table["BackwardBinaryDigit"],
+	                                                       makeKleene!(star, backward)(table["BinaryPeriod"]),
+	                                                       makeQuantifier!backward(table["UU*B"], 0, 3));
 	table["ForwardDecimalLiteral"] = makeSequence(table["ForwardDecimalDigit"],
 	                                              makeKleene!star(makeParallel(table["ForwardDecimalDigit"],
 	                                                                           table["ForwardUnderscore"])));
 	table["BackwardDecimalLiteral"] = makeSequence!backward(makeKleene!(star, backward)(table["XU"]),
-	                                                    table["BackwardDecimalDigit"],
-	                                                    makeKleene!(star, backward)(table["Period"]),
-	                                                    makeQuantifier!backward(table["UU*D"], 0, 2));
+	                                                        table["BackwardDecimalDigit"],
+	                                                        makeKleene!(star, backward)(table["DecimalPeriod"]),
+	                                                        makeQuantifier!backward(table["UU*D"], 0, 2));
 	table["IntegerSuffix"] = makeParallel(makeSequence("Lu"),
 	                                      makeSequence("LU"),
 	                                      makeSequence("uL"),
@@ -59,7 +73,9 @@ Engine makeDigitalLiteral()
 	                                      makeSequence("u"),
 	                                      makeSequence("U"));
 	table["DecimalInteger"] = makeHitherAndThither(table["ForwardDecimalLiteral"], table["BackwardDecimalLiteral"]);
-	table["IntLiteral"] = makeSequence(table["DecimalInteger"], makeQuantifier(table["IntegerSuffix"], 0, 1));
+	table["BinaryInteger"] = makeHitherAndThither(table["ForwardBinaryLiteral"], table["BackwardBinaryLiteral"]);
+	table["Integer"] = makeParallel(table["BinaryInteger"], table["DecimalInteger"]);
+	table["IntLiteral"] = makeSequence(table["Integer"], makeQuantifier(table["IntegerSuffix"], 0, 1));
 	return table["IntLiteral"];
 }
 
