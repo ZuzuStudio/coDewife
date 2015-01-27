@@ -1,7 +1,7 @@
 module fsm.elementar;
 
 import fsm.common;
-import terms.invariantsequence;
+import terms.common;
 import std.conv;
 
 final class Elementar(Direction direction, bool isAllIdentity = false): Engine
@@ -64,10 +64,10 @@ unittest
 	output = null;
 }
 
-Engine makeSingleIdentity(Direction direction = forward, OutputType = InvariantSequence)(string symbol)
+Engine makeSingleIdentity(Direction direction = forward, string OutputType = "IS")(string symbol)
 {
 	return new Elementar!direction(delegate (string s) => s == symbol,
-	                               delegate (string s) => cast(OutputTerm[])[] ~ new OutputType(s));
+	                               delegate (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!(OutputType)(s));
 }
 
 unittest
@@ -131,10 +131,10 @@ unittest
 	assert(output.charSequence == "ар");
 }
 
-Engine makeRangeIdentity(Direction direction = forward, OutputType = InvariantSequence)(string down, string up)
+Engine makeRangeIdentity(Direction direction = forward, string OutputType = "IS")(string down, string up)
 {
 	return new Elementar!direction(delegate (string s) => down <= s && s <= up,
-	                               delegate (string s) => cast(OutputTerm[])[] ~ new OutputType(s));
+	                               delegate (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!(OutputType)(s));
 }
 
 unittest
@@ -166,7 +166,7 @@ unittest
 	position = 0;
 	output = null;
 
-	/+
+	
 	position = 3;
 	machine = makeAllIdentity!(Direction.backward)();
 	assert(machine.parse("reverse", position, output));
@@ -184,28 +184,26 @@ unittest
 	assert(machine.parse("reverse", position, output)); // assert(!machine.parse("reverse", position, output));
 	assert(position == 0); 
 	assert(output.charSequence == "rev");
-	+/
 }
 
-Engine makeAllIdentity(Direction direction = forward, OutputType = InvariantSequence)()
+Engine makeAllIdentity(Direction direction = forward, string OutputType = "IS")()
 {
 	return new Elementar!(direction, true)(delegate (string s) => true, 
-	                                       delegate (string s) => cast(OutputTerm[])[] ~ new OutputType(s));
+	                                       delegate (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!(OutputType)(s));
 }
 
 unittest
 {
-	import terms.underscore, terms.invariantsequence;
 	auto engine = makeGeneral((string s) => s == "_", 
-	                          (string s) => cast(OutputTerm[])[] ~ new UserUnderscore);
+	                          (string s) => cast(OutputTerm[])[] ~ makeUserUnderscoreTerm());
 
 	size_t position;
 	OutputTerm[] output = [];
 	assert(engine.parse("_", position, output));
 	assert(position == 1);
-	UserUnderscore.printable = true;
+	enableUserUnderscore();
 	assert(output.charSequence == "_");
-	UserUnderscore.printable = false;
+	disableUserUnderscore();
 	assert(output.charSequence == "");
 
 	position = 0;
@@ -216,7 +214,7 @@ unittest
 
 
 	engine = makeGeneral((string s) => "А" <= s && s <= "Я", /+ both char is cyrillic +/
-	                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new InvariantSequence(s));
+	                     (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(s) ~ makeInvariantTerm(s));
 	position = 0;
 	output = [];
 	assert(engine.parse("ЯНЫ", position, output));
@@ -238,9 +236,8 @@ unittest
 
 unittest
 {
-	import terms.underscore, terms.invariantsequence;
 	auto engine = makeGeneral!backward((string s) => "0" <= s && s <= "9", 
-	                                   (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s) ~ new LogicalUnderscore);
+	                                   (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(s) ~ makeLogicalUnderscoreTerm());
 	
 	size_t position = 4;
 	OutputTerm[] output = [];
@@ -248,9 +245,9 @@ unittest
 	assert(engine.parse("1234", position, output));
 	assert(engine.parse("1234", position, output));
 	assert(position == 1);
-	LogicalUnderscore.printable = true;
+	enableLogicalUnderscore();
 	assert(output.charSequence == "2_3_4_");
-	LogicalUnderscore.printable = false;
+	disableLogicalUnderscore();
 	assert(output.charSequence == "234");
 	
 	assert(engine.parse("1234", position, output));
@@ -274,7 +271,7 @@ unittest
 	assert(output == []);
 	
 	engine = makeGeneral!backward((string s) => true,
-	                              (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))));
+	                              (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(to!string(cast(dchar)(decodeFront(s)+1))));
 	position = 0;
 	output = [];
 	assert(!engine.parse("Я", position, output));

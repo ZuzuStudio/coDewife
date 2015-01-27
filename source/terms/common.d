@@ -61,6 +61,8 @@ public:
 
 // =======> Invariant Terms
 
+// IS
+
 unittest
 {
 	static assert(__traits(compiles, {auto engine = makeInvariantTerm("a");}));
@@ -70,9 +72,9 @@ unittest
 	assert(term.id == "IS");
 }
 
-OutputTerm makeInvariantTerm(string s)
+OutputTerm makeInvariantTerm(string type = "IS")(string s)
 {
-	auto result = new TermConfigurator!("IS");
+	auto result = new TermConfigurator!(type);
 	result.deactive = s;
 	result.active = s;
 	return result;
@@ -86,6 +88,7 @@ unittest
 {
 	static assert(__traits(compiles, {auto engine = makeUserUnderscoreTerm();}));
 	
+	disableUserUnderscore();
 	auto term_1 = makeUserUnderscoreTerm();
 	auto term_2 = makeUserUnderscoreTerm();
 	assert(term_1.charSequence == "");
@@ -123,6 +126,8 @@ unittest
 {
 	static assert(__traits(compiles, {auto engine = makeCommonUnderscoreTerm();}));
 	
+	disableCommonUnderscore();
+	disableUserUnderscore();
 	auto term_1 = makeCommonUnderscoreTerm();
 	auto term_2 = makeUserUnderscoreTerm();
 	assert(term_1.charSequence == "");
@@ -161,6 +166,8 @@ unittest
 {
 	static assert(__traits(compiles, {auto engine = makeLogicalUnderscoreTerm();}));
 	
+	disableLogicalUnderscore();
+	disableCommonUnderscore();
 	auto term_1 = makeLogicalUnderscoreTerm();
 	auto term_2 = makeCommonUnderscoreTerm();
 	assert(term_1.charSequence == "");
@@ -199,6 +206,8 @@ unittest
 {
 	static assert(__traits(compiles, {auto engine = makeLastUnderscoreTerm();}));
 	
+	disableLastUnderscore();
+	disableCommonUnderscore();
 	auto term_1 = makeLastUnderscoreTerm();
 	auto term_2 = makeCommonUnderscoreTerm();
 	assert(term_1.charSequence == "");
@@ -229,4 +238,65 @@ void enableLastUnderscore()
 void disableLastUnderscore()
 {
 	TermConfigurator!("XU").active_enabled = false;
+}
+
+// =======> KeyWord Terms
+
+// KW
+
+unittest
+{
+	static assert(__traits(compiles, {auto engine = makeKeyWordTerm("a");}));
+	
+	auto term = makeKeyWordTerm("f");
+	assert(term.charSequence == "f");
+	assert(term.id == "KW");
+}
+
+OutputTerm makeKeyWordTerm(string s)
+{
+	auto result = new TermConfigurator!("KW");
+	result.deactive = s;
+	result.active = s;
+	return result;
+}
+
+// =======> CharLiteral Terms
+
+// SQ
+
+unittest
+{
+	static assert(__traits(compiles, {auto engine = makeSingleQuoteTerm();}));
+	
+	auto term = makeSingleQuoteTerm();
+	assert(term.charSequence == "'");
+	assert(term.id == "SQ");
+}
+
+OutputTerm makeSingleQuoteTerm()
+{
+	auto result = new TermConfigurator!("SQ");
+	result.deactive = "'";
+	result.active = "'";
+	return result;
+}
+
+// CL
+
+unittest
+{
+	static assert(__traits(compiles, {auto engine = makeCharLiteralTerm("a");}));
+	
+	auto term = makeCharLiteralTerm("b");
+	assert(term.charSequence == "b");
+	assert(term.id == "CL");
+}
+
+OutputTerm makeCharLiteralTerm(string s)
+{
+	auto result = new TermConfigurator!("CL");
+	result.deactive = s;
+	result.active = s;
+	return result;
 }

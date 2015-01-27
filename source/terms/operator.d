@@ -2,6 +2,9 @@ module operator;
 
 import terms.common;
 
+// TODO BinaryOperator, UnaryOperator, BinaryOperatorPadding, UnaryOperatorPadding
+
+/*
 unittest
 {
 	assert(isOutputTerm!BinaryOperator);
@@ -93,3 +96,4 @@ public:
 private:
 	string opString;
 }
+*/
