@@ -5,7 +5,7 @@ import std.datetime;
 
 
 import fsm.configurations;
-import terms.underscore;
+import terms.common;
 import sample.intliteral;
 
 
@@ -22,9 +22,9 @@ void main()
 	
 	OutputTerm[] terms;
 	size_t position = 0;
-	LogicalUnderscore.printable = true;
-	UserUnderscore.printable = false;
-	CommonUnderscore.printable = true;
+	enableLogicalUnderscore();
+	disableUserUnderscore();
+	enableCommonUnderscore();
 	
 	StopWatch sw;
 	

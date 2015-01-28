@@ -2,7 +2,7 @@ module main;
 
 import  std.stdio;
 
-import	terms.underscore;
+import	terms.common;
 import	fsm.configurations;
 import	sample.identifier;
 

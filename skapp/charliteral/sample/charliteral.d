@@ -1,47 +1,46 @@
 module sample.charliteral;
 
-import terms.charliteral;
-import terms.invariantsequence;
+import terms.common;
 import fsm.configurations;
 
 Engine makeHungryMachine()
 {
-  return makeAllIdentity!(forward, Unknown)();
+  return makeAllIdentity!(forward, "UK")();
 }
 
 
 Engine makeCharLiteral()
 {
   Engine[string] table;
-  table["Character"] = makeAllIdentity!(forward, CharLiteral)();
+  table["Character"] = makeAllIdentity!(forward, "CL")();
   table["HexLetter"] = makeGeneral((string s) => (("a" <= s && s <= "f") || ("A" <= s && s <= "F") || s == "_"),
-                                   (string s) => cast(OutputTerm[])[] ~ new CharLiteral(s));
+                                   (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!("CL")(s));
   table["OctalDigit"] = makeGeneral((string s) => (("0" <= s && s <= "7") || s == "_"),
-                                    (string s) => cast(OutputTerm[])[] ~ new CharLiteral(s));
-  table["DecimalDigit"] = makeRangeIdentity!(forward, CharLiteral)("0", "9");
+                                    (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!("CL")(s));
+  table["DecimalDigit"] = makeRangeIdentity!(forward, "CL")("0", "9");
   table["HexDigit"] = makeParallel(table["DecimalDigit"],
                                    table["HexLetter"]);
-  table["EscapeSequence"] = makeParallel(makeSequence!(forward, CharLiteral)(`\'`),
-                                         makeSequence!(forward, CharLiteral)(`\"`),
-                                         makeSequence!(forward, CharLiteral)(`\?`),
-                                         makeSequence!(forward, CharLiteral)(`\\`),
-                                         makeSequence!(forward, CharLiteral)(`\0`),
-                                         makeSequence!(forward, CharLiteral)(`\a`),
-                                         makeSequence!(forward, CharLiteral)(`\b`),
-                                         makeSequence!(forward, CharLiteral)(`\f`),
-                                         makeSequence!(forward, CharLiteral)(`\n`),
-                                         makeSequence!(forward, CharLiteral)(`\r`),
-                                         makeSequence!(forward, CharLiteral)(`\t`),
-                                         makeSequence!(forward, CharLiteral)(`\v`),
-                                         makeSequence(makeSequence!(forward, CharLiteral)(`\x`), table["HexDigit"], table["HexDigit"]),
-                                         makeSequence(makeSingleIdentity!(forward, CharLiteral)(`\`), table["OctalDigit"]),
-                                         makeSequence(makeSingleIdentity!(forward, CharLiteral)(`\`), table["OctalDigit"], table["OctalDigit"]),
-                                         makeSequence(makeSingleIdentity!(forward, CharLiteral)(`\`), table["OctalDigit"], table["OctalDigit"], table["OctalDigit"]),
-                                         makeSequence(makeSequence!(forward, CharLiteral)(`\u`), table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"]),
-                                         makeSequence(makeSequence!(forward, CharLiteral)(`\U`), table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"]),);
+  table["EscapeSequence"] = makeParallel(makeSequence!(forward, "CL")(`\'`),
+                                         makeSequence!(forward, "CL")(`\"`),
+                                         makeSequence!(forward, "CL")(`\?`),
+                                         makeSequence!(forward, "CL")(`\\`),
+                                         makeSequence!(forward, "CL")(`\0`),
+                                         makeSequence!(forward, "CL")(`\a`),
+                                         makeSequence!(forward, "CL")(`\b`),
+                                         makeSequence!(forward, "CL")(`\f`),
+                                         makeSequence!(forward, "CL")(`\n`),
+                                         makeSequence!(forward, "CL")(`\r`),
+                                         makeSequence!(forward, "CL")(`\t`),
+                                         makeSequence!(forward, "CL")(`\v`),
+                                         makeSequence(makeSequence!(forward, "CL")(`\x`), table["HexDigit"], table["HexDigit"]),
+                                         makeSequence(makeSingleIdentity!(forward, "CL")(`\`), table["OctalDigit"]),
+                                         makeSequence(makeSingleIdentity!(forward, "CL")(`\`), table["OctalDigit"], table["OctalDigit"]),
+                                         makeSequence(makeSingleIdentity!(forward, "CL")(`\`), table["OctalDigit"], table["OctalDigit"], table["OctalDigit"]),
+                                         makeSequence(makeSequence!(forward, "CL")(`\u`), table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"]),
+                                         makeSequence(makeSequence!(forward, "CL")(`\U`), table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"], table["HexDigit"]),);
   table["SingleQuotedCharacter"] = makeParallel(table["EscapeSequence"],
                                                 table["Character"]);
-  table["SingleQuote"] = makeSingleIdentity!(forward, SingleQuote)("'");
+  table["SingleQuote"] = makeSingleIdentity!(forward, "SQ")("'");
   table["CharLiteral"] = makeSequence(table["SingleQuote"],
                                       table["SingleQuotedCharacter"],
                                       table["SingleQuote"]);

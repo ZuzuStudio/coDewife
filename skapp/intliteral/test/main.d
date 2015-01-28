@@ -2,7 +2,7 @@ module main;
 
 import  std.stdio;
 
-import	terms.underscore;
+import	terms.common;
 import	fsm.configurations;
 import 	sample.intliteral;
 
@@ -18,27 +18,27 @@ void main()
 	{}
 
 	writeln("============= No Underscore ================");
-	LogicalUnderscore.printable = false;
-	UserUnderscore.printable = false;
-	CommonUnderscore.printable = false;
+	disableLogicalUnderscore();
+	disableUserUnderscore();
+	disableCommonUnderscore();
 	terms.output();
 	writeln("\n============================================");
 	writeln("============= User Underscore ==============");
-	LogicalUnderscore.printable = false;
-	UserUnderscore.printable = true;
-	CommonUnderscore.printable = true;
+	disableLogicalUnderscore();
+	enableUserUnderscore();
+	enableCommonUnderscore();
 	terms.output();
 	writeln("\n============================================");
 	writeln("============= Logical Underscore ===========");
-	LogicalUnderscore.printable = true;
-	UserUnderscore.printable = false;
-	CommonUnderscore.printable = true;
+	enableLogicalUnderscore();
+	disableUserUnderscore();
+	enableCommonUnderscore();
 	terms.output();
 	writeln("\n============================================");
 	writeln("============= Common Underscore ============");
-	LogicalUnderscore.printable = false;
-	UserUnderscore.printable = false;
-	CommonUnderscore.printable = true;
+	disableLogicalUnderscore();
+	disableUserUnderscore();
+	enableCommonUnderscore();
 	terms.output();
 	writeln("\n============================================");
 }

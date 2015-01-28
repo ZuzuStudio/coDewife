@@ -1,17 +1,17 @@
 module sample.identifier;
 
-import terms.invariantsequence;
+import terms.common;
 import fsm.configurations;
 
 Engine makeIdentifier()
 {
   Engine[string] table;
-  table["_"] = makeSingleIdentity("_");
+  table["_"] = makeSingleIdentity!(forward, "ID")("_");
   table["Letter"] = makeGeneral((string s) => ("a" <= s && s <= "z") || ("A" <= s && s <= "Z"),
-                                (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
-  table["0"] = makeSingleIdentity("0");
+                                (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!("ID")(s));
+  table["0"] = makeSingleIdentity!(forward, "ID")("0");
   table["NonZeroDigit"] = makeGeneral((string s) => "1" <= s && s <= "9",
-                                      (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
+                                      (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!("ID")(s));
                                       
   table["IdentifierStart"] = makeParallel(table["_"], table["Letter"]); // TODO universal alpha                                    
   table["IdentifierChar"] = makeParallel(table["IdentifierStart"], table["0"], table["NonZeroDigit"]);

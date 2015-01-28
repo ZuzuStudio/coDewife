@@ -1,8 +1,7 @@
 module sample.intliteral;
 
-import terms.underscore;
+import terms.common;
 import fsm.configurations;
-import terms.invariantsequence;
 
 Engine makeDigitalLiteral()
 {
@@ -15,13 +14,13 @@ Engine makeDigitalLiteral()
 	table["BackwardBinaryDigit"] = makeRangeIdentity!backward("0", "1");
 	table["BackwardLUBinaryDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "1",
 	                                                      (string s) => cast(OutputTerm[])[]
-	                                                                    ~ new InvariantSequence(s)
-	                                                                    ~ new LogicalUnderscore);
+	                                                                    ~ makeInvariantTerm(s)
+	                                                                    ~ makeLogicalUnderscoreTerm());
 	table["BackwardLULUBinaryDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "1",
 	                                                        (string s) => cast(OutputTerm[])[]
-	                                                                      ~ new InvariantSequence(s)
-	                                                                      ~ new LogicalUnderscore
-	                                                                      ~ new LogicalUnderscore);
+	                                                                      ~ makeInvariantTerm(s)
+	                                                                      ~ makeLogicalUnderscoreTerm()
+	                                                                      ~ makeLogicalUnderscoreTerm());
 	table["ForwardDecimalDigit"] = makeGeneral((string s) => "0" <= s && s <= "9",
 	                                           (string s) => cast(OutputTerm[])[]);
 	table["ForwardUnderscore"] = makeGeneral((string s) => s == "_",
@@ -29,14 +28,14 @@ Engine makeDigitalLiteral()
 	table["BackwardDecimalDigit"] = makeRangeIdentity!backward("0", "9");
 	table["BackwardLUDecimalDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "9",
 	                                                       (string s) => cast(OutputTerm[])[]
-	                                                                     ~ new InvariantSequence(s)
-	                                                                     ~ new LogicalUnderscore);
+	                                                                     ~ makeInvariantTerm(s)
+	                                                                     ~ makeLogicalUnderscoreTerm());
 	table["XU"] = makeGeneral!backward((string s) => s == "_",
-	                                   (string s) => cast(OutputTerm[])[] ~ new LastUnderscore);
+	                                   (string s) => cast(OutputTerm[])[] ~ makeLastUnderscoreTerm());
 	table["CU"] = makeGeneral!backward((string s) => s == "_",
-	                                   (string s) => cast(OutputTerm[])[] ~ new CommonUnderscore);
+	                                   (string s) => cast(OutputTerm[])[] ~ makeCommonUnderscoreTerm());
 	table["UU"] = makeGeneral!backward((string s) => s == "_",
-	                                   (string s) => cast(OutputTerm[])[] ~ new UserUnderscore);
+	                                   (string s) => cast(OutputTerm[])[] ~ makeUserUnderscoreTerm());
 	table["UU*B"] = makeSequence!backward(makeKleene!(star, backward)(table["UU"]),
 	                                      table["BackwardBinaryDigit"]);
 	table["UU*D"] = makeSequence!backward(makeKleene!(star, backward)(table["UU"]),
@@ -82,5 +81,5 @@ Engine makeDigitalLiteral()
 Engine makeSymbolIdentity()
 {
 	return makeGeneral((string s) => true,
-	                   (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));
+	                   (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(s));
 }

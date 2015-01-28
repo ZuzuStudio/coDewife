@@ -5,7 +5,7 @@ import std.datetime;
 
 
 import fsm.configurations;
-import terms.underscore;
+import terms.common;
 import sample.identifier;
 
 
