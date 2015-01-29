@@ -69,7 +69,11 @@ unittest
 	
 	auto term = makeInvariantTerm("D");
 	assert(term.charSequence == "D");
-	assert(term.id == "IS");
+
+	debug
+	{
+		assert(term.id == "IS");
+	}
 }
 
 OutputTerm makeInvariantTerm(string type = "IS")(string s)
@@ -82,162 +86,74 @@ OutputTerm makeInvariantTerm(string type = "IS")(string s)
 
 // =======> Underscore Terms
 
-// UU
-
 unittest
 {
-	static assert(__traits(compiles, {auto engine = makeUserUnderscoreTerm();}));
-	
-	disableUserUnderscore();
-	auto term_1 = makeUserUnderscoreTerm();
-	auto term_2 = makeUserUnderscoreTerm();
-	assert(term_1.charSequence == "");
-	assert(term_2.charSequence == "");
-	enableUserUnderscore();
-	assert(term_1.charSequence == "_");
-	assert(term_2.charSequence == "_");
-	disableUserUnderscore();
-	assert(term_1.charSequence == "");
-	assert(term_2.charSequence == "");
-	assert(term_1.id == "UU");
+	static assert(__traits(compiles, {auto term = makeUnderscoreTerm!"UU"();}));
+	static assert(__traits(compiles, {auto term = makeUnderscoreTerm!"XU"();}));
+	static assert(__traits(compiles, {auto term = makeUnderscoreTerm!"LU"();}));
+	static assert(__traits(compiles, {auto term = makeUnderscoreTerm!"CU"();}));
+	static assert(!__traits(compiles, {auto term = makeUnderscoreTerm!"uU"();}));
+	OutputTerm[] sequence = [];
+	sequence ~= makeUnderscoreTerm!"UU"();
+	sequence ~= makeInvariantTerm(":");
+	sequence ~= makeUnderscoreTerm!"XU"();
+	sequence ~= makeInvariantTerm(":");
+	sequence ~= makeUnderscoreTerm!"LU"();
+	sequence ~= makeInvariantTerm(":");
+	sequence ~= makeUnderscoreTerm!"CU"();
+
+	disableUnderscore();
+	assert(sequence.charSequence == ":::");
+
+	keepUserUnderscore();
+	assert(sequence.charSequence == "_:::_");
+
+	keepAllUserUnderscore();
+	assert(sequence.charSequence == "_:_::_");
+
+	bytifyUnderscore();
+	assert(sequence.charSequence == "::_:_");
 }
 
-OutputTerm makeUserUnderscoreTerm()
+OutputTerm makeUnderscoreTerm(string variant)()
+	if(variant == "UU" || variant == "XU" || variant == "LU" || variant == "CU")
 {
-	auto result = new TermConfigurator!("UU");
+	auto result = new TermConfigurator!variant;
 	result.deactive = "";
 	result.active = "_";
 	return result;
 }
 
-void enableUserUnderscore()
-{
-	TermConfigurator!("UU").active_enabled = true;
-}
-
-void disableUserUnderscore()
+void disableUnderscore()
 {
 	TermConfigurator!("UU").active_enabled = false;
-}
-
-// CU
-
-unittest
-{
-	static assert(__traits(compiles, {auto engine = makeCommonUnderscoreTerm();}));
-	
-	disableCommonUnderscore();
-	disableUserUnderscore();
-	auto term_1 = makeCommonUnderscoreTerm();
-	auto term_2 = makeUserUnderscoreTerm();
-	assert(term_1.charSequence == "");
-	assert(term_2.charSequence == "");
-	enableCommonUnderscore();
-	assert(term_1.charSequence == "_");
-	assert(term_2.charSequence == "");
-	disableCommonUnderscore();
-	enableUserUnderscore();
-	assert(term_1.charSequence == "");
-	assert(term_2.charSequence == "_");
-	assert(term_1.id == "CU");
-}
-
-OutputTerm makeCommonUnderscoreTerm()
-{
-	auto result = new TermConfigurator!("CU");
-	result.deactive = "";
-	result.active = "_";
-	return result;
-}
-
-void enableCommonUnderscore()
-{
-	TermConfigurator!("CU").active_enabled = true;
-}
-
-void disableCommonUnderscore()
-{
+	TermConfigurator!("XU").active_enabled = false;
+	TermConfigurator!("LU").active_enabled = false;
 	TermConfigurator!("CU").active_enabled = false;
 }
 
-// LU
-
-unittest
+void keepUserUnderscore()
 {
-	static assert(__traits(compiles, {auto engine = makeLogicalUnderscoreTerm();}));
-	
-	disableLogicalUnderscore();
-	disableCommonUnderscore();
-	auto term_1 = makeLogicalUnderscoreTerm();
-	auto term_2 = makeCommonUnderscoreTerm();
-	assert(term_1.charSequence == "");
-	assert(term_2.charSequence == "");
-	enableLogicalUnderscore();
-	assert(term_1.charSequence == "_");
-	assert(term_2.charSequence == "");
-	disableLogicalUnderscore();
-	enableCommonUnderscore();
-	assert(term_1.charSequence == "");
-	assert(term_2.charSequence == "_");
-	assert(term_1.id == "LU");
-}
-
-OutputTerm makeLogicalUnderscoreTerm()
-{
-	auto result = new TermConfigurator!("LU");
-	result.deactive = "";
-	result.active = "_";
-	return result;
-}
-
-void enableLogicalUnderscore()
-{
-	TermConfigurator!("LU").active_enabled = true;
-}
-
-void disableLogicalUnderscore()
-{
-	TermConfigurator!("LU").active_enabled = false;
-}
-
-// XU
-
-unittest
-{
-	static assert(__traits(compiles, {auto engine = makeLastUnderscoreTerm();}));
-	
-	disableLastUnderscore();
-	disableCommonUnderscore();
-	auto term_1 = makeLastUnderscoreTerm();
-	auto term_2 = makeCommonUnderscoreTerm();
-	assert(term_1.charSequence == "");
-	assert(term_2.charSequence == "");
-	enableLastUnderscore();
-	assert(term_1.charSequence == "_");
-	assert(term_2.charSequence == "");
-	disableLastUnderscore();
-	enableCommonUnderscore();
-	assert(term_1.charSequence == "");
-	assert(term_2.charSequence == "_");
-	assert(term_1.id == "XU");
-}
-
-OutputTerm makeLastUnderscoreTerm()
-{
-	auto result = new TermConfigurator!("XU");
-	result.deactive = "";
-	result.active = "_";
-	return result;
-}
-
-void enableLastUnderscore()
-{
-	TermConfigurator!("XU").active_enabled = true;
-}
-
-void disableLastUnderscore()
-{
+	TermConfigurator!("UU").active_enabled = true;
 	TermConfigurator!("XU").active_enabled = false;
+	TermConfigurator!("LU").active_enabled = false;
+	TermConfigurator!("CU").active_enabled = true;
+}
+
+void keepAllUserUnderscore()
+{
+	TermConfigurator!("UU").active_enabled = true;
+	TermConfigurator!("XU").active_enabled = true;
+	TermConfigurator!("LU").active_enabled = false;
+	TermConfigurator!("CU").active_enabled = true;
+}
+
+void bytifyUnderscore()
+{
+	TermConfigurator!("UU").active_enabled = false;
+	TermConfigurator!("XU").active_enabled = false;
+	TermConfigurator!("LU").active_enabled = true;
+	TermConfigurator!("CU").active_enabled = true;
 }
 
 // =======> KeyWord Terms
@@ -250,7 +166,10 @@ unittest
 	
 	auto term = makeKeyWordTerm("f");
 	assert(term.charSequence == "f");
-	assert(term.id == "KW");
+	debug
+	{
+		assert(term.id == "KW");
+	}
 }
 
 OutputTerm makeKeyWordTerm(string s)
@@ -271,7 +190,10 @@ unittest
 	
 	auto term = makeSingleQuoteTerm();
 	assert(term.charSequence == "'");
-	assert(term.id == "SQ");
+	debug
+	{
+		assert(term.id == "SQ");
+	}
 }
 
 OutputTerm makeSingleQuoteTerm()
@@ -290,7 +212,10 @@ unittest
 	
 	auto term = makeCharLiteralTerm("b");
 	assert(term.charSequence == "b");
-	assert(term.id == "CL");
+	debug
+	{
+		assert(term.id == "CL");
+	}
 }
 
 OutputTerm makeCharLiteralTerm(string s)
