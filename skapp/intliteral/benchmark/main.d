@@ -22,9 +22,7 @@ void main()
 	
 	OutputTerm[] terms;
 	size_t position = 0;
-	enableLogicalUnderscore();
-	disableUserUnderscore();
-	enableCommonUnderscore();
+	bytifyUnderscore();
 	
 	StopWatch sw;
 	

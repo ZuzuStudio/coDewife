@@ -18,27 +18,19 @@ void main()
 	{}
 
 	writeln("============= No Underscore ================");
-	disableLogicalUnderscore();
-	disableUserUnderscore();
-	disableCommonUnderscore();
+	disableUnderscore();
 	terms.output();
 	writeln("\n============================================");
 	writeln("============= User Underscore ==============");
-	disableLogicalUnderscore();
-	enableUserUnderscore();
-	enableCommonUnderscore();
+	keepUserUnderscore();
 	terms.output();
 	writeln("\n============================================");
-	writeln("============= Logical Underscore ===========");
-	enableLogicalUnderscore();
-	disableUserUnderscore();
-	enableCommonUnderscore();
+	writeln("============= All User Underscore ===========");
+	keepAllUserUnderscore();
 	terms.output();
 	writeln("\n============================================");
-	writeln("============= Common Underscore ============");
-	disableLogicalUnderscore();
-	disableUserUnderscore();
-	enableCommonUnderscore();
+	writeln("============= Logical Underscore ============");
+	bytifyUnderscore();
 	terms.output();
 	writeln("\n============================================");
 }

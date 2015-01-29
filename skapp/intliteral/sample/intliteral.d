@@ -15,12 +15,12 @@ Engine makeDigitalLiteral()
 	table["BackwardLUBinaryDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "1",
 	                                                      (string s) => cast(OutputTerm[])[]
 	                                                                    ~ makeInvariantTerm(s)
-	                                                                    ~ makeLogicalUnderscoreTerm());
+	                                                                    ~ makeUnderscoreTerm!"LU"());
 	table["BackwardLULUBinaryDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "1",
 	                                                        (string s) => cast(OutputTerm[])[]
 	                                                                      ~ makeInvariantTerm(s)
-	                                                                      ~ makeLogicalUnderscoreTerm()
-	                                                                      ~ makeLogicalUnderscoreTerm());
+	                                                                      ~ makeUnderscoreTerm!"LU"()
+	                                                                      ~ makeUnderscoreTerm!"LU"());
 	table["ForwardDecimalDigit"] = makeGeneral((string s) => "0" <= s && s <= "9",
 	                                           (string s) => cast(OutputTerm[])[]);
 	table["ForwardUnderscore"] = makeGeneral((string s) => s == "_",
@@ -29,13 +29,13 @@ Engine makeDigitalLiteral()
 	table["BackwardLUDecimalDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "9",
 	                                                       (string s) => cast(OutputTerm[])[]
 	                                                                     ~ makeInvariantTerm(s)
-	                                                                     ~ makeLogicalUnderscoreTerm());
+	                                                                     ~ makeUnderscoreTerm!"LU"());
 	table["XU"] = makeGeneral!backward((string s) => s == "_",
-	                                   (string s) => cast(OutputTerm[])[] ~ makeLastUnderscoreTerm());
+	                                   (string s) => cast(OutputTerm[])[] ~ makeUnderscoreTerm!"XU"());
 	table["CU"] = makeGeneral!backward((string s) => s == "_",
-	                                   (string s) => cast(OutputTerm[])[] ~ makeCommonUnderscoreTerm());
+	                                   (string s) => cast(OutputTerm[])[] ~ makeUnderscoreTerm!"CU"());
 	table["UU"] = makeGeneral!backward((string s) => s == "_",
-	                                   (string s) => cast(OutputTerm[])[] ~ makeUserUnderscoreTerm());
+	                                   (string s) => cast(OutputTerm[])[] ~ makeUnderscoreTerm!"UU"());
 	table["UU*B"] = makeSequence!backward(makeKleene!(star, backward)(table["UU"]),
 	                                      table["BackwardBinaryDigit"]);
 	table["UU*D"] = makeSequence!backward(makeKleene!(star, backward)(table["UU"]),
