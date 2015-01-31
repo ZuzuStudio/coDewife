@@ -4,7 +4,7 @@ import std.stdio;
 import std.datetime;
 
 
-import fsm.configurations;
+import codewife.fsm.configurations;
 import sample.charliteral;
 
 

@@ -2,9 +2,9 @@ module main;
 
 import  std.stdio;
 
-import	terms.common;
-import	fsm.configurations;
-import 	sample.intliteral;
+import  codewife.terms.common;
+import  codewife.fsm.configurations;
+import  sample.intliteral;
 
 void main()
 {

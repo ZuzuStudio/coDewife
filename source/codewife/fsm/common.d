@@ -1,6 +1,6 @@
-module fsm.common;
+module codewife.fsm.common;
 
-public import terms.common;
+public import codewife.terms.common;
 
 interface Engine
 {

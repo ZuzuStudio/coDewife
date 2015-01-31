@@ -1,7 +1,7 @@
-module fsm.elementar;
+module codewife.fsm.elementar;
 
-import fsm.common;
-import terms.common;
+import codewife.fsm.common;
+import codewife.terms.common;
 import std.conv;
 
 final class Elementar(Direction direction, bool isAllIdentity = false): Engine
@@ -195,15 +195,15 @@ Engine makeAllIdentity(Direction direction = forward, string OutputType = "IS")(
 unittest
 {
 	auto engine = makeGeneral((string s) => s == "_", 
-	                          (string s) => cast(OutputTerm[])[] ~ makeUserUnderscoreTerm());
+	                          (string s) => cast(OutputTerm[])[] ~ makeUnderscoreTerm!"UU"());
 
 	size_t position;
 	OutputTerm[] output = [];
 	assert(engine.parse("_", position, output));
 	assert(position == 1);
-	enableUserUnderscore();
+	keepUserUnderscore();
 	assert(output.charSequence == "_");
-	disableUserUnderscore();
+	disableUnderscore();
 	assert(output.charSequence == "");
 
 	position = 0;
@@ -237,7 +237,7 @@ unittest
 unittest
 {
 	auto engine = makeGeneral!backward((string s) => "0" <= s && s <= "9", 
-	                                   (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(s) ~ makeLogicalUnderscoreTerm());
+	                                   (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(s) ~ makeUnderscoreTerm!"LU"());
 	
 	size_t position = 4;
 	OutputTerm[] output = [];
@@ -245,9 +245,10 @@ unittest
 	assert(engine.parse("1234", position, output));
 	assert(engine.parse("1234", position, output));
 	assert(position == 1);
-	enableLogicalUnderscore();
+
+	TermConfigurator!("LU").active_enabled = true;
 	assert(output.charSequence == "2_3_4_");
-	disableLogicalUnderscore();
+	TermConfigurator!("LU").active_enabled = false;
 	assert(output.charSequence == "234");
 	
 	assert(engine.parse("1234", position, output));

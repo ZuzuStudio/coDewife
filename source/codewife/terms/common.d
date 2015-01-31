@@ -1,4 +1,4 @@
-﻿module terms.common;
+﻿module codewife.terms.common;
 
 import std.traits;
 public import std.utf;

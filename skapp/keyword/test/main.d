@@ -2,7 +2,7 @@ module main;
 
 import  std.stdio;
 
-import	fsm.configurations;
+import	codewife.fsm.configurations;
 import	sample.keyword;
 
 void main()
