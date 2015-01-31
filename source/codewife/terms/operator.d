@@ -1,6 +1,6 @@
-module operator;
+module codewife.operator;
 
-import terms.common;
+import codewife.terms.common;
 
 // TODO BinaryOperator, UnaryOperator, BinaryOperatorPadding, UnaryOperatorPadding
 

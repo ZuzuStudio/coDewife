@@ -2,8 +2,8 @@ module main;
 
 import  std.stdio;
 
-import	terms.common;
-import	fsm.configurations;
+import	codewife.terms.common;
+import	codewife.fsm.configurations;
 import	sample.identifier;
 
 void main()

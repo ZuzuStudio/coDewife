@@ -1,9 +1,8 @@
-module fsm.configurations;
+module codewife.fsm.configurations;
 
 import std.conv;
-public import fsm.common;
-public import fsm.elementar;
-//public import terms.invariantsequence;
+public import codewife.fsm.common;
+public import codewife.fsm.elementar;
 
 // MAYBE private
 final class Configurator(Direction direction): Engine

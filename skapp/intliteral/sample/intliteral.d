@@ -1,7 +1,7 @@
 module sample.intliteral;
 
-import terms.common;
-import fsm.configurations;
+import codewife.terms.common;
+import codewife.fsm.configurations;
 
 Engine makeDigitalLiteral()
 {

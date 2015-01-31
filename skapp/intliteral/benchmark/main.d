@@ -4,8 +4,8 @@ import std.stdio;
 import std.datetime;
 
 
-import fsm.configurations;
-import terms.common;
+import codewife.fsm.configurations;
+import codewife.terms.common;
 import sample.intliteral;
 
 
