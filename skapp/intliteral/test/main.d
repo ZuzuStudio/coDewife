@@ -53,3 +53,12 @@ void output(OutputTerm[] terms)
 	}
 	writeln();
 }
+
+version(monod)
+{
+	static ~this()
+	{
+		write("Press Enter to continue...");
+		readln();
+	}
+}
