@@ -246,9 +246,9 @@ unittest
 	assert(engine.parse("1234", position, output));
 	assert(position == 1);
 
-	TermConfigurator!("LU").active_enabled = true;
+	TermBistate!("LU").activated = true;
 	assert(output.charSequence == "2_3_4_");
-	TermConfigurator!("LU").active_enabled = false;
+	TermBistate!("LU").activated = false;
 	assert(output.charSequence == "234");
 	
 	assert(engine.parse("1234", position, output));

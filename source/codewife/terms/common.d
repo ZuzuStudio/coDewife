@@ -36,18 +36,38 @@ string charSequence(OutputTerm[] terms)
 		return result;
 }
 
-final class TermConfigurator(string term_id) : OutputTerm
+final class TermMonostate(string term_id) : OutputTerm
+{
+private:
+	string payload;
+	
+public:	
+	string charSequence() @property
+	{
+		return payload;
+	}
+	
+	debug
+	{
+		override string id()@property
+		{
+			return term_id;
+		}
+	}
+}
+
+final class TermBistate(string term_id) : OutputTerm
 {
 private:
 	string deactive;
 	string active;
 
 public:
-	static bool active_enabled;
+	static bool activated;
 	
 	string charSequence() @property
 	{
-		return active_enabled ? active : deactive;
+		return activated? active: deactive;
 	}
 	
 	debug
@@ -78,9 +98,8 @@ unittest
 
 OutputTerm makeInvariantTerm(string type = "IS")(string s)
 {
-	auto result = new TermConfigurator!(type);
-	result.deactive = s;
-	result.active = s;
+	auto result = new TermMonostate!(type);
+	result.payload = s;
 	return result;
 }
 
@@ -118,7 +137,7 @@ unittest
 OutputTerm makeUnderscoreTerm(string variant)()
 	if(variant == "UU" || variant == "XU" || variant == "LU" || variant == "CU")
 {
-	auto result = new TermConfigurator!variant;
+	auto result = new TermBistate!variant;
 	result.deactive = "";
 	result.active = "_";
 	return result;
@@ -126,34 +145,34 @@ OutputTerm makeUnderscoreTerm(string variant)()
 
 void disableUnderscore()
 {
-	TermConfigurator!("UU").active_enabled = false;
-	TermConfigurator!("XU").active_enabled = false;
-	TermConfigurator!("LU").active_enabled = false;
-	TermConfigurator!("CU").active_enabled = false;
+	TermBistate!("UU").activated = false;
+	TermBistate!("XU").activated = false;
+	TermBistate!("LU").activated = false;
+	TermBistate!("CU").activated = false;
 }
 
 void keepUserUnderscore()
 {
-	TermConfigurator!("UU").active_enabled = true;
-	TermConfigurator!("XU").active_enabled = false;
-	TermConfigurator!("LU").active_enabled = false;
-	TermConfigurator!("CU").active_enabled = true;
+	TermBistate!("UU").activated = true;
+	TermBistate!("XU").activated = false;
+	TermBistate!("LU").activated = false;
+	TermBistate!("CU").activated = true;
 }
 
 void keepAllUserUnderscore()
 {
-	TermConfigurator!("UU").active_enabled = true;
-	TermConfigurator!("XU").active_enabled = true;
-	TermConfigurator!("LU").active_enabled = false;
-	TermConfigurator!("CU").active_enabled = true;
+	TermBistate!("UU").activated = true;
+	TermBistate!("XU").activated = true;
+	TermBistate!("LU").activated = false;
+	TermBistate!("CU").activated = true;
 }
 
 void bytifyUnderscore()
 {
-	TermConfigurator!("UU").active_enabled = false;
-	TermConfigurator!("XU").active_enabled = false;
-	TermConfigurator!("LU").active_enabled = true;
-	TermConfigurator!("CU").active_enabled = true;
+	TermBistate!("UU").activated = false;
+	TermBistate!("XU").activated = false;
+	TermBistate!("LU").activated = true;
+	TermBistate!("CU").activated = true;
 }
 
 // =======> KeyWord Terms
@@ -174,9 +193,8 @@ unittest
 
 OutputTerm makeKeyWordTerm(string s)
 {
-	auto result = new TermConfigurator!("KW");
-	result.deactive = s;
-	result.active = s;
+	auto result = new TermMonostate!("KW");
+	result.payload = s;
 	return result;
 }
 
@@ -198,9 +216,8 @@ unittest
 
 OutputTerm makeSingleQuoteTerm()
 {
-	auto result = new TermConfigurator!("SQ");
-	result.deactive = "'";
-	result.active = "'";
+	auto result = new TermMonostate!("SQ");
+	result.payload = "'";
 	return result;
 }
 
@@ -220,8 +237,7 @@ unittest
 
 OutputTerm makeCharLiteralTerm(string s)
 {
-	auto result = new TermConfigurator!("CL");
-	result.deactive = s;
-	result.active = s;
+	auto result = new TermMonostate!("CL");
+	result.payload = s;
 	return result;
 }
