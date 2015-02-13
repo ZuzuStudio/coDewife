@@ -1,0 +1,36 @@
+{
+	"name": "coDewife",
+	"description": "code formatter",
+	"authors": ["HaraldZealot", "krucios"],
+	"homepage": "https://github.com/ZuzuStudio/coDewife",
+	"copyright": "Copyright (c) 2014 Aliaksei Stankevich, Andrei Pazniak",
+	"configurations":[
+		{
+			"name": "library",
+			"targetType": "library",
+			"targetPath": "build/lib"
+		},
+		{
+			"name": "standalone",
+			"targetType": "executable",
+			"targetPath": "build/app",
+			"workingDirectory": "build/app"
+		},
+		{
+			"name": "intliteral",
+			"sourcePath": "skapp/intliteral/test",
+			"targetType": "executable",
+			"targetName": "testIntliteral",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "benchIntliteral",
+			"sourcePath": "skapp/intliteral/benchmark",
+			"targetType": "executable",
+			"targetName": "benchIntliteral",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		}
+	]
+}
