@@ -1,8 +1,8 @@
-module fsm.configurations;
+module codewife.fsm.configurations;
 
 import std.conv;
-public import fsm.common;
-public import fsm.elementar;
+public import codewife.fsm.common;
+public import codewife.fsm.elementar;
 
 // MAYBE private
 final class Configurator(Direction direction): Engine
@@ -124,18 +124,17 @@ unittest
 	assert(output.charSequence == "бвг");
 }
 
-Engine makeSequence(Direction direction = forward)(string keyString)
+Engine makeSequence(Direction direction = forward, string OutputType = "IS")(string keyString)
 {
-	import terms.invariantsequence;
 	Engine[] list;
 	foreach(dchar symbol; keyString)
 	{
 		static if(direction == forward)
-			list ~= makeSingleIdentity(to!string(symbol));
+			list ~= makeSingleIdentity!(forward, OutputType)(to!string(symbol));
 		else
 		{
 			list ~= makeGeneral!(Direction.backward)((string s) => s == to!string(symbol),
-			                                         (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s));	
+			                                         (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!(OutputType)(s));	
 		}
 	}
 	return makeSequence!direction(list);
@@ -362,9 +361,8 @@ unittest
 	assert(position == 0);
 	assert(output == []);
 
-	import terms.invariantsequence;
 	engine = makeKleene!(star, backward)(makeGeneral!(Direction.backward)((string s) => "0" <= s && s <= "9",
-	                                                                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s)));
+	                                                                     (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(s)));
 	position = 7;
 	output = [];
 	assert(engine.parse("123a456", position, output));
@@ -378,7 +376,7 @@ unittest
 	assert(output == []);
 
 	engine = makeKleene!(plus, backward)(makeGeneral!(Direction.backward)((string s) => "0" <= s && s <= "9",
-	                                                                      (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s)));
+	                                                                      (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(s)));
 	position = 7;
 	output = [];
 	assert(engine.parse("123a456", position, output));
@@ -751,13 +749,12 @@ body
 
 unittest
 {
-	import terms.invariantsequence;
 	auto engine = makeHitherAndThither(makeKleene!star(makeGeneral((string s) => "0" <= s && s <= "9", 
-	                                                                 (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
+	                                                               (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(s))),
 	                                   makeSequence!backward(makeKleene!(star, backward)(makeGeneral!(Direction.backward)((string s) => s == "2" || s == "5",
-	                                                                                                                     (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(to!string(cast(dchar)(decodeFront(s)+1))))),
+	                                                                                                                      (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(to!string(cast(dchar)(decodeFront(s)+1))))),
 	                                                         makeGeneral!backward((string s) => true,
-	                                                                                          (string s) => cast(OutputTerm[])[] ~ new InvariantSequence("_"))));
+	                                                                              (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm("_"))));
 
 	size_t position = 0;
 	OutputTerm[] output = [];
@@ -766,9 +763,9 @@ unittest
 	assert(output.charSequence == "32452552_63663");
 
 	engine = makeHitherAndThither(makeKleene!star(makeGeneral((string s) => "1" <= s && s <= "9", 
-	                                                            (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(s))),
+	                                                          (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(s))),
 	                              makeGeneral!backward((string s) => s == "3" || s == "6" || s == "9",
-	                                                               (string s) => cast(OutputTerm[])[] ~ new InvariantSequence(":" ~ s)));
+	                                                   (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm(":" ~ s)));
 	position = 0;
 	output = [];
 	assert(!engine.parse("12567ttt", position, output));

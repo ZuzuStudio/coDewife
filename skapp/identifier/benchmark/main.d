@@ -6,7 +6,7 @@ import std.datetime;
 
 import codewife.fsm.configurations;
 import codewife.terms.common;
-import sample.intliteral;
+import sample.identifier;
 
 
 void main()
@@ -17,12 +17,11 @@ void main()
 		text ~= line;
 	
 	Engine[] steam_engine;
-	steam_engine ~= makeDigitalLiteral();
+	steam_engine ~= makeIdentifier();
 	steam_engine ~= makeAllIdentity();
 	
 	OutputTerm[] terms;
 	size_t position = 0;
-	bytifyUnderscore();
 	
 	StopWatch sw;
 	

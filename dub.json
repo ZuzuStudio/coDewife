@@ -1,5 +1,5 @@
 {
-	"name": "coDewife",
+	"name": "codewife",
 	"description": "code formatter",
 	"authors": ["HaraldZealot", "krucios"],
 	"homepage": "https://github.com/ZuzuStudio/coDewife",
@@ -29,6 +29,54 @@
 			"sourcePath": "skapp/intliteral/benchmark",
 			"targetType": "executable",
 			"targetName": "benchIntliteral",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "identifier",
+			"sourcePath": "skapp/identifier/test",
+			"targetType": "executable",
+			"targetName": "testIdentifier",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "benchIdentifier",
+			"sourcePath": "skapp/identifier/benchmark",
+			"targetType": "executable",
+			"targetName": "benchIdentifier",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "charliteral",
+			"sourcePath": "skapp/charliteral/test",
+			"targetType": "executable",
+			"targetName": "testCharliteral",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "benchCharliteral",
+			"sourcePath": "skapp/charliteral/benchmark",
+			"targetType": "executable",
+			"targetName": "benchCharliteral",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "keyword",
+			"sourcePath": "skapp/keyword/test",
+			"targetType": "executable",
+			"targetName": "testKeyword",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "benchKeyword",
+			"sourcePath": "skapp/keyword/benchmark",
+			"targetType": "executable",
+			"targetName": "benchKeyword",
 			"targetPath": "build/skapp",
 			"workingDirectory": "build/skapp" 
 		}
