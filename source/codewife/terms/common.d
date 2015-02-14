@@ -25,7 +25,7 @@ interface OutputTerm
 
 unittest
 {
-	assert(charSequence([makeInvariantTerm("jack"), makeInvariantTerm("_6.3")]) == "jack_6.3");
+	assert(charSequence(makeInvariantTerm("jack") ~ makeInvariantTerm("_6.3")) == "jack_6.3");
 }
 
 string charSequence(OutputTerm[] terms)
@@ -79,6 +79,11 @@ public:
 	}
 }
 
+OutputTerm[] makeEmpty()
+{
+	return cast(OutputTerm[])[];
+}
+
 // =======> Invariant Terms
 
 // IS
@@ -92,15 +97,15 @@ unittest
 
 	debug
 	{
-		assert(term.id == "IS");
+		assert(term[0].id == "IS");
 	}
 }
 
-OutputTerm makeInvariantTerm(string type = "IS")(string s)
+OutputTerm[] makeInvariantTerm(string type = "IS")(string s)
 {
 	auto result = new TermMonostate!(type);
 	result.payload = s;
-	return result;
+	return makeEmpty() ~ result;
 }
 
 // =======> Underscore Terms
@@ -134,13 +139,13 @@ unittest
 	assert(sequence.charSequence == "::_:_");
 }
 
-OutputTerm makeUnderscoreTerm(string variant)()
+OutputTerm[] makeUnderscoreTerm(string variant)()
 	if(variant == "UU" || variant == "XU" || variant == "LU" || variant == "CU")
 {
 	auto result = new TermBistate!variant;
 	result.deactive = "";
 	result.active = "_";
-	return result;
+	return makeEmpty() ~ result;
 }
 
 void disableUnderscore()
@@ -187,15 +192,15 @@ unittest
 	assert(term.charSequence == "f");
 	debug
 	{
-		assert(term.id == "KW");
+		assert(term[0].id == "KW");
 	}
 }
 
-OutputTerm makeKeyWordTerm(string s)
+OutputTerm[] makeKeyWordTerm(string s)
 {
 	auto result = new TermMonostate!("KW");
 	result.payload = s;
-	return result;
+	return makeEmpty() ~ result;
 }
 
 // =======> CharLiteral Terms
@@ -210,15 +215,15 @@ unittest
 	assert(term.charSequence == "'");
 	debug
 	{
-		assert(term.id == "SQ");
+		assert(term[0].id == "SQ");
 	}
 }
 
-OutputTerm makeSingleQuoteTerm()
+OutputTerm[] makeSingleQuoteTerm()
 {
 	auto result = new TermMonostate!("SQ");
 	result.payload = "'";
-	return result;
+	return makeEmpty() ~ result;
 }
 
 // CL
@@ -231,13 +236,13 @@ unittest
 	assert(term.charSequence == "b");
 	debug
 	{
-		assert(term.id == "CL");
+		assert(term[0].id == "CL");
 	}
 }
 
-OutputTerm makeCharLiteralTerm(string s)
+OutputTerm[] makeCharLiteralTerm(string s)
 {
 	auto result = new TermMonostate!("CL");
 	result.payload = s;
-	return result;
+	return makeEmpty() ~ result;
 }

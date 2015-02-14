@@ -14,9 +14,9 @@ Engine makeCharLiteral()
   Engine[string] table;
   table["Character"] = makeAllIdentity!(forward, "CL")();
   table["HexLetter"] = makeGeneral((string s) => (("a" <= s && s <= "f") || ("A" <= s && s <= "F") || s == "_"),
-                                   (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!("CL")(s));
+                                   (string s) => makeInvariantTerm!("CL")(s));
   table["OctalDigit"] = makeGeneral((string s) => (("0" <= s && s <= "7") || s == "_"),
-                                    (string s) => cast(OutputTerm[])[] ~ makeInvariantTerm!("CL")(s));
+                                    (string s) => makeInvariantTerm!("CL")(s));
   table["DecimalDigit"] = makeRangeIdentity!(forward, "CL")("0", "9");
   table["HexDigit"] = makeParallel(table["DecimalDigit"],
                                    table["HexLetter"]);

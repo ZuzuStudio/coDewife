@@ -47,14 +47,17 @@ void output(OutputTerm[] terms)
 		writef("%2s ", term.charSequence);
 	}
 	writeln();
-	foreach(term; terms)
-	{
-		write(term.id,":");
+	debug{
+		foreach(term; terms)
+		{
+			write(term.id,":");
+		}
+		writeln();
 	}
-	writeln();
+
 }
 
-version(monod)
+version(DigitalMars)
 {
 	static ~this()
 	{
