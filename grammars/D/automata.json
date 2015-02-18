@@ -1,0 +1,60 @@
+[
+	{
+		"name": "GlobalD",
+		"type": "parallel",
+		"automata":
+		[
+			"IntegerLiteral",
+			"NonEof"
+		]
+	},
+	{
+		"name": "IntegerLiteral",
+		"type": "sequence",
+		"automata": 
+		[
+			"Integer",
+			"IntegerSuffix"
+		]
+	},
+	{
+		"name": "Integer",
+		"type": "parallel",
+		"automata":
+		[
+			"BinaryInteger",
+			"DecimalInteger"
+		]
+	},
+	{
+		"name": "BinaryInteger",
+		"type": "HaT",
+		"automata":
+		[
+			"ForwardBinaryInteger",
+			"BackwardBinaryInteger"
+		]
+	},
+	{
+		"name": "ForwardBinaryInteger",
+		"type": "sequence",
+		"automata":
+		[
+			"BinaryPrefix",
+			{
+				"type": "Kleene star",
+				"automata":
+				[
+					{
+						"type": "parallel",
+						"automata":
+						[
+							"ForwardBinaryDigit",
+							"ForwardUnderscore"
+						]
+					}
+				]
+			}
+		]
+	}
+]
