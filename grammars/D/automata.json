@@ -28,7 +28,7 @@
 	},
 	{
 		"name": "BinaryInteger",
-		"type": "HaT",
+		"type": "heatherAndTheather",
 		"automata":
 		[
 			"ForwardBinaryInteger",
@@ -41,20 +41,92 @@
 		"automata":
 		[
 			"BinaryPrefix",
+			"ForwardBinaryLiteralGlyphs"
+		]
+	},
+	{
+		"name": "BinaryPrefix",
+		"type": "sequence",
+		"automata":
+		[
+			"ZeroDigit",
+			"Bb"
+		]
+	},
+	{
+		"name": "ZeroDigit",
+		"type": "singleIdentity",
+		"string": "0"
+	},
+	{
+		"name": "Bb",
+		"type": "parallel",
+		"automata":
+		[
+			"BLetter",
+			"bLetter"
+		]
+	},
+	{
+		"name": "BLetter",
+		"type": "singleIdentity",
+		"string": "B"
+	},
+	{
+		"name": "bLetter",
+		"type": "singleIdentity",
+		"string": "b"
+	},
+	{
+		"name": "ForwardBinaryLiteralGlyphs",
+		"type": "Kleene star",
+		"automata":
+		[
+			"ForwardBinaryLiteralGlyph",
+		]
+	},
+	{
+		"name": "ForwardBinaryLiteralGlyph",
+		"type": "parallel",
+		"automata":
+		[
+			"ForwardBinaryDigit",
+			"ForwardUnderscore"
+		]
+	},
+	{
+		"name": "ForwardBinaryDigit",
+		"type": "general",
+		"predicate":
+		{
+			"union": "or",
+			"a":
 			{
-				"type": "Kleene star",
-				"automata":
-				[
-					{
-						"type": "parallel",
-						"automata":
-						[
-							"ForwardBinaryDigit",
-							"ForwardUnderscore"
-						]
-					}
-				]
-			}
+				"compare": "==",
+				"value": "0"
+			},
+			"b":
+			{
+				"compare": "==",
+				"value": "1"
+			},
+		},
+		"mapping":
+		[
+			"empty"
+		]
+	},
+	{
+		"name": "ForwardUnderscore",
+		"type": "general",
+		"predicate":
+		{
+				"compare": "==",
+				"value": "_"
+		},
+		"mapping":
+		[
+			"empty"
 		]
 	}
 ]
