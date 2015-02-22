@@ -41,7 +41,7 @@
 		"automata":
 		[
 			"BinaryPrefix",
-			"ForwardBinaryLiteralGlyphs"
+			"PluralForwardBinaryLiteralGlyph"
 		]
 	},
 	{
@@ -78,7 +78,7 @@
 		"string": "b"
 	},
 	{
-		"name": "ForwardBinaryLiteralGlyphs",
+		"name": "PluralForwardBinaryLiteralGlyph",
 		"type": "Kleene star",
 		"automata":
 		[
@@ -127,6 +127,18 @@
 		"mapping":
 		[
 			"empty"
+		]
+	},
+	{
+		"name": "BackwardBinaryInteger",
+		"type": "sequence",
+		"direction": "backward",
+		"automata":
+		[
+			"PluralXU",
+			"BacwardBinaryDigit",
+			"PluralBinaryPeriod",
+			"RestBackwardBinaryInteger"
 		]
 	}
 ]
