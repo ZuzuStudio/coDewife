@@ -140,5 +140,14 @@
 			"PluralBinaryPeriod",
 			"RestBackwardBinaryInteger"
 		]
+	},
+	{
+		"name": "PluralXU",
+		"type": "Kleene star",
+		"direction": "backward",
+		"automata":
+		[
+			"XU"
+		]
 	}
 ]
