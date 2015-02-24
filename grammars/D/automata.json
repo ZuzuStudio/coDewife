@@ -149,5 +149,35 @@
 		[
 			"XU"
 		]
+	},
+	{
+		"name": "XU",
+		"type": "general",
+		"direction": "bacward",
+		"predicate":
+		{
+			"compare": "==",
+			"value": "_"
+		},
+		"mapping":
+		[
+			"XU OT"
+		]
+	},
+	{
+		"name": "BacwardBinaryDigit",
+		"type": "rangeIdentity",
+		"direction": "backward",
+		"from": "0",
+		"to": "1"
+	},
+	{
+		"name": "PluralBinaryPeriod",
+		"type": "Kleene star",
+		"direction": "backward",
+		"automata":
+		[
+			"BinaryPeriod",
+		]
 	}
 ]
