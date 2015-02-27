@@ -99,15 +99,15 @@
 		"type": "general",
 		"predicate":
 		{
-			"union": "or",
+			"union": "and",
 			"a":
 			{
-				"compare": "==",
+				"compare": ">=",
 				"value": "0"
 			},
 			"b":
 			{
-				"compare": "==",
+				"compare": "<=",
 				"value": "1"
 			},
 		},
@@ -153,7 +153,7 @@
 	{
 		"name": "XU",
 		"type": "general",
-		"direction": "bacward",
+		"direction": "backward",
 		"predicate":
 		{
 			"compare": "==",
@@ -178,6 +178,129 @@
 		"automata":
 		[
 			"BinaryPeriod",
+		]
+	},
+	{
+		"name": "BinaryPeriod",
+		"type": "sequence",
+		"direction": "backward",
+		"automata":
+		[
+			"3UU*B",
+			"PotencialLU"
+		],
+	},
+	{
+		"name": "3UU*B",
+		"type": "quantifier",
+		"direction": "backward",
+		"min": 3,
+		"max": 3,
+		"automata":
+		[
+			"UU*B"
+		]
+	},
+	{
+		"name": "UU*B",
+		"type": "sequence",
+		"direction": "backward",
+		"automata": 
+		[
+			"PluralUU",
+			"BackwardBinaryDigit"
+		]
+	},
+	{
+		"name": "PluralUU",
+		"type": "Kleene star",
+		"direction": "backward",
+		"automata": 
+		[
+			"UU"
+		]
+	},
+	{
+		"name": "UU",
+		"type": "general",
+		"direction": "backward",
+		"predicate":
+		{
+			"compare": "==",
+			"value": "_"
+		},
+		"mapping":
+		[
+			"UU OT"
+		]
+	},
+	{
+		"name": "PotencialLU",
+		"type": "parallel",
+		"direction": "backward",
+		"automata":
+		[
+			"CUUU*B",
+			"BackwardLUBinaryDigit"
+		]
+	},
+	{
+		"name": "CUUU*B",
+		"type": "sequence",
+		"direction": "backward",
+		"automata":
+		[
+			"CU",
+			"PluralUU",
+			"BackwardBinaryDigit"
+		]
+	},
+	{
+		"name": "CU",
+		"type": "general",
+		"direction": "backward",
+		"predicate":
+		{
+			"compare": "==",
+			"value": "_"
+		},
+		"mapping":
+		[
+			"CU OT"
+		]
+	},
+	{
+		"name": "BackwardLUBinaryDigit",
+		"type": "general",
+		"direction": "backward",
+		"predicate":
+		{
+			"union": "and",
+			"a":
+			{
+				"compare": ">=",
+				"value": "0"
+			},
+			"b":
+			{
+				"compare": "<=",
+				"value": "1"
+			},
+		},
+		"mapping":
+		[
+			"identity",
+			"LU OT"
+		]
+	},
+	{
+		"name": "RestBackwardBinaryInteger",
+		"type": "quantifier",
+		"min": 0,
+		"max": 3,
+		"automata":
+		[
+			"UU*B"
 		]
 	}
 ]
