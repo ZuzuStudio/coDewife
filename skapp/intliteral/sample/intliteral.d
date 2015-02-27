@@ -9,7 +9,7 @@ Engine makeDigitalLiteral()
 	table["BinaryPrefix"] = makeSequence(makeSingleIdentity("0"),
 	                                     makeParallel(makeSingleIdentity("b"),
 	                                                  makeSingleIdentity("B")));
-	table["ForwardBinaryDigit"] = makeGeneral((string s) => s == "0" || s == "1",
+	table["ForwardBinaryDigit"] = makeGeneral((string s) => "0" <= s && s <= "1",
 	                                          (string s) => makeEmpty());
 	table["BackwardBinaryDigit"] = makeRangeIdentity!backward("0", "1");
 	table["BackwardLUBinaryDigit"] = makeGeneral!backward((string s) => "0" <= s && s <= "1",
