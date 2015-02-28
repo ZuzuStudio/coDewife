@@ -17,6 +17,14 @@
 			"workingDirectory": "build/app"
 		},
 		{
+			"name": "grammarChecker",
+			"sourcePath": "utils/grammarChecker",
+			"targetType": "executable",
+			"targetName": "grammarchecker",
+			"targetPath": "build/utils",
+			"workingDirectory": "build/utils"
+		},
+		{
 			"name": "intliteral",
 			"sourcePath": "skapp/intliteral/test",
 			"targetType": "executable",
