@@ -14,7 +14,7 @@ void main()
 	foreach(automat; jsonTree.array)
 	{
 		auto isForwardDirection = "direction" !in automat || automat["direction"].str == "forward"; 
-		writeln(automat["name"],"(",automat["type"],") ", isForwardDirection? "->": "<-");
+		writeln(automat["name"], isForwardDirection? "-->": "<--", automat["type"]);
 		foreach(subautomat; automat["automata"].array)
 			writeln("\t", subautomat);
 	}
