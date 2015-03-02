@@ -4,6 +4,9 @@ import std.json;
 import std.stdio;
 import std.range;
 
+immutable(string[]) elementar = ["general", "singleIdentity", "rangeIdentity", "allIdentity"];
+immutable(string[]) configurations = ["sequence", "parallel", "Kleene star", "Kleene plus", "quantifier", "heatherAndTheather"];
+
 void main()
 {
 	string allText;
