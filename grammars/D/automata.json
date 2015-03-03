@@ -82,7 +82,7 @@
 		"type": "Kleene star",
 		"automata":
 		[
-			"ForwardBinaryLiteralGlyph",
+			"ForwardBinaryLiteralGlyph"
 		]
 	},
 	{
@@ -109,7 +109,7 @@
 			{
 				"compare": "<=",
 				"value": "1"
-			},
+			}
 		},
 		"mapping":
 		[
@@ -177,7 +177,7 @@
 		"direction": "backward",
 		"automata":
 		[
-			"BinaryPeriod",
+			"BinaryPeriod"
 		]
 	},
 	{
@@ -188,7 +188,7 @@
 		[
 			"3UU*B",
 			"PotencialLU"
-		],
+		]
 	},
 	{
 		"name": "3UU*B",
@@ -285,7 +285,7 @@
 			{
 				"compare": "<=",
 				"value": "1"
-			},
+			}
 		},
 		"mapping":
 		[
@@ -296,6 +296,7 @@
 	{
 		"name": "RestBackwardBinaryInteger",
 		"type": "quantifier",
+		"direction": "backward",
 		"min": 0,
 		"max": 3,
 		"automata":
