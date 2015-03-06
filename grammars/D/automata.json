@@ -303,5 +303,14 @@
 		[
 			"UU*B"
 		]
+	},
+	{
+		"name": "DecimalInteger",
+		"type": "heatherAndTheather",
+		"automata":
+		[
+			"ForwardDecimalInteger",
+			"BackwardDecimalInteger"
+		]
 	}
 ]
