@@ -312,5 +312,53 @@
 			"ForwardDecimalInteger",
 			"BackwardDecimalInteger"
 		]
+	},
+	{
+		"name": "ForwardDecimalInteger",
+		"type": "sequence",
+		"automata":
+		[
+			"ForwardDecimalDigit",
+			"PluralForwardDecimalLiteralGlyph"
+		]
+	},
+	{
+		"name": "ForwardDecimalDigit",
+		"type": "general",
+		"predicate":
+		{
+			"union": "and",
+			"a":
+			{
+				"compare": ">=",
+				"value": "0"
+			},
+			"b":
+			{
+				"compare": "<=",
+				"value": "9"
+			}
+		},
+		"mapping":
+		[
+			"empty"
+		]
+	},
+	{
+		"name": "PluralForwardDecimalLiteralGlyph",
+		"type": "Kleene star",
+		"automata":
+		[
+			"ForwardDecimalGlyph"
+		]
+	},
+	{
+		"name": "ForwardDecimalGlyph",
+		"type": "parallel",
+		"automata":
+		[
+			"ForwardDecimalDigit",
+			"ForwardUnderscore"
+		]
 	}
 ]
