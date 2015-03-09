@@ -87,6 +87,14 @@
 			"targetName": "benchKeyword",
 			"targetPath": "build/skapp",
 			"workingDirectory": "build/skapp" 
+		},
+		{
+			"name": "benchFastToOT",
+			"sourcePath": "skapp/fot/benchmark",
+			"targetType": "executable",
+			"targetName": "benchFOT",
+			"targetPath": "build/skapp",
+			"workingDirectory": "build/skapp" 
 		}
 	]
 }
