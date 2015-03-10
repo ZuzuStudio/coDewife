@@ -187,7 +187,7 @@
 		"automata":
 		[
 			"3UU*B",
-			"PotencialLU"
+			"PotencialBinaryLU"
 		]
 	},
 	{
@@ -235,7 +235,7 @@
 		]
 	},
 	{
-		"name": "PotencialLU",
+		"name": "PotencialBinaryLU",
 		"type": "parallel",
 		"direction": "backward",
 		"automata":
@@ -386,6 +386,16 @@
 		"automata":
 		[
 			"DecimalPeriod"
+		]
+	},
+	{
+		"name": "DecimalPeriod",
+		"type": "sequence",
+		"direction": "backward",
+		"automata":
+		[
+			"2UU*D",
+			"PotencialDecimalLU"
 		]
 	}
 ]
