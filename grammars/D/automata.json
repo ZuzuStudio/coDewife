@@ -397,5 +397,16 @@
 			"2UU*D",
 			"PotencialDecimalLU"
 		]
+	},
+	{
+		"name": "2UU*D",
+		"type": "quantifier",
+		"direction": "backward",
+		"min": 3,
+		"max": 3,
+		"automata":
+		[
+			"UU*D"
+		]
 	}
 ]
