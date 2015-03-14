@@ -374,7 +374,7 @@
 		]
 	},
 	{
-		"name": "BackwardDecimalInteger",
+		"name": "BackwardDecimalDigit",
 		"type": "rangeIdentity",
 		"direction": "backward",
 		"from": "0",
@@ -402,8 +402,74 @@
 		"name": "2UU*D",
 		"type": "quantifier",
 		"direction": "backward",
-		"min": 3,
-		"max": 3,
+		"min": 2,
+		"max": 2,
+		"automata":
+		[
+			"UU*D"
+		]
+	},
+	{
+		"name": "UU*D",
+		"type": "sequence",
+		"direction": "backward",
+		"automata": 
+		[
+			"PluralUU",
+			"BackwardDecimalDigit"
+		]
+	},
+	{
+		"name": "PotencialDecimalLU",
+		"type": "parallel",
+		"direction": "backward",
+		"automata":
+		[
+			"CUUU*D",
+			"BackwardLUDecimalDigit"
+		]
+	},
+	{
+		"name": "CUUU*D",
+		"type": "sequence",
+		"direction": "backward",
+		"automata":
+		[
+			"CU",
+			"PluralUU",
+			"BackwardDecimalDigit"
+		]
+	},
+	{
+		"name": "BackwardLUDecimalDigit",
+		"type": "general",
+		"direction": "backward",
+		"predicate":
+		{
+			"union": "and",
+			"a":
+			{
+				"compare": ">=",
+				"value": "0"
+			},
+			"b":
+			{
+				"compare": "<=",
+				"value": "9"
+			}
+		},
+		"mapping":
+		[
+			"identity",
+			"LU OT"
+		]
+	},
+	{
+		"name": "RestBackwardDecimalInteger",
+		"type": "quantifier",
+		"direction": "backward",
+		"min": 0,
+		"max": 2,
 		"automata":
 		[
 			"UU*D"
