@@ -11,11 +11,7 @@ immutable(string[]) configurations = ["sequence", "parallel", "Kleene star", "Kl
 
 int main()
 {
-	string allText;
-	foreach(line; stdin.byLine)
-		allText ~= line;
-
-	auto jsonTree = parseJSON(allText);
+	auto jsonTree = stdin.byChunk(4096).joiner.parseJSON;
 	foreach(automat; jsonTree.array)
 	{
 		check(("name" in automat), automat, "No name defined");
