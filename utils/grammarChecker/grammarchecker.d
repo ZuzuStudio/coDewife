@@ -11,7 +11,31 @@ immutable(string[]) configurations = ["sequence", "parallel", "Kleene star", "Kl
 
 int main()
 {
-	auto jsonTree = stdin.byChunk(4096).joiner.parseJSON;
+	auto rawText = stdin.byChunk(4096).joiner;
+	dchar[] stack;
+	uint line = 1;
+	foreach(dchar c; rawText)
+	{
+		if(c == '\n')
+			++line;
+		if(c == '{')
+			stack ~= c;
+		if(c == '[')
+			stack ~= c;
+		if(c == '}')
+		{
+			if(stack[$-1] != '{')
+				stderr.writeln("There is an error in ", line, " line:\nnot matching braces");
+			--stack.length;
+		}
+		if(c == ']')
+		{
+			if(stack[$-1] != '[')
+				stderr.writeln("There is an error in ", line, " line:\nnot matching braces");
+			--stack.length;
+		}
+	}
+	auto jsonTree = rawText.parseJSON;
 	foreach(automat; jsonTree.array)
 	{
 		check(("name" in automat), automat, "No name defined");
