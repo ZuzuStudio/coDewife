@@ -5,36 +5,44 @@ import std.stdio;
 import std.range;
 import std.traits;
 import std.algorithm;
+import std.array;
+//import std.regex;
 
 immutable(string[]) elementar = ["general", "singleIdentity", "rangeIdentity", "allIdentity"];
 immutable(string[]) configurations = ["sequence", "parallel", "Kleene star", "Kleene plus", "quantifier", "heatherAndTheather"];
 
+//alias splitter = std.regex.splitter;
+
 int main()
 {
-	auto rawText = stdin.byChunk(4096).joiner;
+	auto rawText = stdin.byChunk(4096).joiner.array;
 	dchar[] stack;
-	uint line = 1;
-	foreach(dchar c; rawText)
+	uint lineNo = 1;
+	
+	foreach(line; rawText.splitter(cast(ubyte)'\n'))
 	{
-		if(c == '\n')
-			++line;
-		if(c == '{')
-			stack ~= c;
-		if(c == '[')
-			stack ~= c;
-		if(c == '}')
+		foreach(dchar c; cast(char[])line)
 		{
-			if(stack[$-1] != '{')
-				stderr.writeln("There is an error in ", line, " line:\nnot matching braces");
-			--stack.length;
+			if(c == '{')
+				stack ~= c;
+			if(c == '[')
+				stack ~= c;
+			if(c == '}')
+			{
+				if(stack[$-1] != '{')
+					stderr.writeln("There is an error in ", lineNo, " line:\n", cast(char[])line,"\nnot matching braces");
+				--stack.length;
+			}
+			if(c == ']')
+			{
+				if(stack[$-1] != '[')
+					stderr.writeln("There is an error in ", lineNo, " line:\n", cast(char[])line,"\nnot matching braces");
+				--stack.length;
+			}
 		}
-		if(c == ']')
-		{
-			if(stack[$-1] != '[')
-				stderr.writeln("There is an error in ", line, " line:\nnot matching braces");
-			--stack.length;
-		}
+		++lineNo;
 	}
+	
 	auto jsonTree = rawText.parseJSON;
 	foreach(automat; jsonTree.array)
 	{
