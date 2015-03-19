@@ -11,6 +11,8 @@ import std.array;
 immutable(string[]) elementar = ["general", "singleIdentity", "rangeIdentity", "allIdentity"];
 immutable(string[]) configurations = ["sequence", "parallel", "Kleene star", "Kleene plus", "quantifier", "heatherAndTheather"];
 
+
+
 //alias splitter = std.regex.splitter;
 
 int main()
@@ -19,24 +21,19 @@ int main()
 	dchar[] stack;
 	uint lineNo = 1;
 	
+	dchar[dchar] complimentar = [ cast(dchar)'}':cast(dchar)'{', '{':'}', ']':'[', '[':']', ];
+	
 	foreach(line; rawText.splitter(cast(ubyte)'\n'))
 	{
+		bool escape = false;
 		foreach(dchar c; cast(char[])line)
 		{
-			if(c == '{')
+			if(c == '{' || c == '[' || c == '\\')
 				stack ~= c;
-			if(c == '[')
-				stack ~= c;
-			if(c == '}')
+			if(c == '}' || c == ']')
 			{
-				if(stack[$-1] != '{')
-					stderr.writeln("There is an error in ", lineNo, " line:\n", cast(char[])line,"\nnot matching braces");
-				--stack.length;
-			}
-			if(c == ']')
-			{
-				if(stack[$-1] != '[')
-					stderr.writeln("There is an error in ", lineNo, " line:\n", cast(char[])line,"\nnot matching braces");
+				if(stack[$-1] != complimentar[c])
+					printError(lineNo, line, "not matching braces");
 				--stack.length;
 			}
 		}
@@ -76,4 +73,9 @@ void check(T)(T predicate, lazy JSONValue jsonValue, lazy string message)
 		stderr.writeln(message);
 		core.stdc.stdlib.exit(1);
 	}
+}
+
+void printError(uint lineNo, ubyte[] line, string message)
+{
+	stderr.writeln("There is an error in ", lineNo, " line:\n", cast(char[])line,"\n",message);
 }
