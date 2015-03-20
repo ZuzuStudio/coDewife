@@ -28,7 +28,7 @@ int main()
 		bool escape = false;
 		foreach(dchar c; cast(char[])line)
 		{
-			if(c == '{' || c == '[' || c == '\\')
+			if(c == '{' || c == '[')
 				stack ~= c;
 			if(c == '}' || c == ']')
 			{
@@ -36,6 +36,15 @@ int main()
 					printError(lineNo, line, "not matching braces");
 				--stack.length;
 			}
+			if(c == "\"")
+			{
+				if(stack[$-1] == "\\" || stack[$-1] == "\"")
+					--stack.length;
+				else
+					stack ~= c;
+			}
+			if(c == '\\' )
+				stack ~= c;
 		}
 		++lineNo;
 	}
