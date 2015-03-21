@@ -6,14 +6,9 @@ import std.range;
 import std.traits;
 import std.algorithm;
 import std.array;
-//import std.regex;
 
 immutable(string[]) elementar = ["general", "singleIdentity", "rangeIdentity", "allIdentity"];
 immutable(string[]) configurations = ["sequence", "parallel", "Kleene star", "Kleene plus", "quantifier", "heatherAndTheather"];
-
-
-
-//alias splitter = std.regex.splitter;
 
 int main()
 {
@@ -36,9 +31,9 @@ int main()
 					printError(lineNo, line, "not matching braces");
 				--stack.length;
 			}
-			if(c == "\"")
+			if(c == '\"')
 			{
-				if(stack[$-1] == "\\" || stack[$-1] == "\"")
+				if(stack[$-1] == '\\' || stack[$-1] == '\"')
 					--stack.length;
 				else
 					stack ~= c;
