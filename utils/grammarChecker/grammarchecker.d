@@ -13,37 +13,45 @@ immutable(string[]) configurations = ["sequence", "parallel", "Kleene star", "Kl
 int main()
 {
 	auto rawText = stdin.byChunk(4096).joiner.array;
-	dchar[] stack;
+	Stack stack;
 	uint lineNo = 1;
-	
+
 	dchar[dchar] complimentar = [ cast(dchar)'}':cast(dchar)'{', '{':'}', ']':'[', '[':']', ];
-	
+
 	foreach(line; rawText.splitter(cast(ubyte)'\n'))
 	{
 		bool escape = false;
 		foreach(dchar c; cast(char[])line)
 		{
 			if(c == '{' || c == '[')
-				stack ~= c;
+				stack.push(c);
+
 			if(c == '}' || c == ']')
 			{
-				if(stack[$-1] != complimentar[c])
+				if(stack.last != complimentar[c])
 					printError(lineNo, line, "not matching braces");
-				--stack.length;
+				stack.pop();
 			}
+
+			if(stack.last == '\\' && stack.prelast == '\"')
+				stack.pop();
+			else
+			{
+				if(c == '\\' && stack.last == '\"')
+					stack.push(c);
+			}
+
 			if(c == '\"')
 			{
-				if(stack[$-1] == '\\' || stack[$-1] == '\"')
-					--stack.length;
+				if(stack.last == '\"')
+					stack.pop();
 				else
-					stack ~= c;
+					stack.push(c);
 			}
-			if(c == '\\' )
-				stack ~= c;
 		}
 		++lineNo;
 	}
-	
+
 	auto jsonTree = rawText.parseJSON;
 	foreach(automat; jsonTree.array)
 	{
@@ -66,6 +74,42 @@ int main()
 
 	}
 	return 0;
+}
+
+struct Stack
+{
+	dchar last() @property nothrow pure @safe @nogc
+	{
+		if(representation.length < 1)
+			return '\0';
+		return representation[$ - 1];
+	}
+
+	dchar prelast() @property nothrow pure @safe @nogc
+	{
+		if(representation.length < 2)
+			return '\0';
+		return representation[$ - 2];
+	}
+
+	void push(dchar c)nothrow pure @safe
+	{
+		representation ~= c;
+	}
+
+	void pop()nothrow pure @safe
+	{
+		if(representation.length > 0)
+			--representation.length;
+	}
+
+	dstring toString()pure nothrow @safe
+	{
+		return representation.idup;
+	}
+
+private:
+	dchar[] representation;
 }
 
 void check(T)(T predicate, lazy JSONValue jsonValue, lazy string message)
