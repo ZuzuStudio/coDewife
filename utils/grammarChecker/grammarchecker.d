@@ -30,6 +30,10 @@ int main()
 			{
 				if(stack.last != complimentar[c])
 					printError(lineNo, line, "not matching braces");
+				if(stack.last == ',')
+					printError(lineNo, line, "comma before bracket");
+				if(stack.last == ':')
+					printError(lineNo, line, "collon before bracket");
 				stack.pop();
 			}
 
@@ -41,13 +45,36 @@ int main()
 					stack.push(c);
 			}
 
+			if(c == ',')
+			{
+				if(stack.last == ':')
+					printError(lineNo, line, "comma after collon");
+				else if(stack.last != '\\' && stack.last != '\"')
+					stack.push(c);
+			}
+
+			if(c == ':')
+			{
+				if(stack.last == ',')
+					printError(lineNo, line, "collon after comma");
+				else if(stack.last == '[')
+					printError(lineNo, line, "collon in array");
+				else if(stack.last != '\\' && stack.last != '\"')
+					stack.push(c);
+			}
+
 			if(c == '\"')
 			{
 				if(stack.last == '\"')
 					stack.pop();
 				else
+				{
+					if(stack.last == ',' || stack.last == ':')
+						stack.pop();
 					stack.push(c);
+				}
 			}
+			writeln(stack);
 		}
 		++lineNo;
 	}
