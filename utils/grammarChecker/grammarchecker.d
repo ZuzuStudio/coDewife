@@ -7,8 +7,11 @@ import std.traits;
 import std.algorithm;
 import std.array;
 
+immutable(dchar[]) jsonSymbol = ['[', ']', '{', '}', '\"', '\\', ':', ','];
 immutable(string[]) elementar = ["general", "singleIdentity", "rangeIdentity", "allIdentity"];
 immutable(string[]) configurations = ["sequence", "parallel", "Kleene star", "Kleene plus", "quantifier", "heatherAndTheather"];
+
+enum JsonPlace{empty, invalid, array, object, name, field, andmore, escape, string, boolean, integer, floating};
 
 int main()
 {
@@ -16,65 +19,149 @@ int main()
 	Stack stack;
 	uint lineNo = 1;
 
-	dchar[dchar] complimentar = [ cast(dchar)'}':cast(dchar)'{', '{':'}', ']':'[', '[':']', ];
+	//dchar[dchar] complimentar = [ cast(dchar)'}':cast(dchar)'{', '{':'}', ']':'[', '[':']', ];
 
 	foreach(line; rawText.splitter(cast(ubyte)'\n'))
 	{
-		bool escape = false;
 		foreach(dchar c; cast(char[])line)
 		{
-			if(c == '{' || c == '[')
-				stack.push(c);
-
-			if(c == '}' || c == ']')
+			if(stack.last == JsonPlace.escape)
 			{
-				if(stack.last != complimentar[c])
-					printError(lineNo, line, "not matching braces");
-				if(stack.last == ',')
-					printError(lineNo, line, "comma before bracket");
-				if(stack.last == ':')
-					printError(lineNo, line, "collon before bracket");
 				stack.pop();
+				writeln(stack);
+				continue;
 			}
 
-			if(stack.last == '\\' && stack.prelast == '\"')
-				stack.pop();
-			else
+			if(c == '[' )
 			{
-				if(c == '\\' && stack.last == '\"')
-					stack.push(c);
+				if(stack.last == JsonPlace.empty
+					|| stack.last == JsonPlace.array 
+					|| (stack.last == JsonPlace.andmore && stack.prelast == JsonPlace.array)
+					|| stack.last == JsonPlace.field)
+				{
+					if(stack.last == JsonPlace.andmore)
+						stack.pop();
+					stack.push(JsonPlace.array);
+				}
+				else
+				{
+					stack.push(JsonPlace.invalid);
+					printError(lineNo, line, "suddenly start of array");
+				}
+			}
+
+			if(c == ']')
+			{
+				if(stack.last == JsonPlace.array)
+					stack.pop();
+				else
+				{
+					stack.push(JsonPlace.invalid);
+					printError(lineNo, line, "suddenly end of array");
+				}
+			}
+
+			if(c == '{')
+			{
+				if(stack.last == JsonPlace.empty 
+					|| stack.last == JsonPlace.array 
+					|| (stack.last == JsonPlace.andmore && stack.prelast == JsonPlace.array)
+					|| stack.last == JsonPlace.field)
+				{
+					if(stack.last == JsonPlace.andmore)
+						stack.pop();
+					stack.push(JsonPlace.object);
+				}
+				else
+				{
+					stack.push(JsonPlace.invalid);
+					printError(lineNo, line, "suddenly start of object");
+				}
+			}
+
+			if(c == '}')
+			{
+				if(stack.last == JsonPlace.field)
+				{
+					stack.pop();
+					stack.pop();
+				}
+				else
+				{
+					stack.push(JsonPlace.invalid);
+					printError(lineNo, line, "suddenly end of object");
+				}
 			}
 
 			if(c == ',')
 			{
-				if(stack.last == ':')
-					printError(lineNo, line, "comma after collon");
-				else if(stack.last != '\\' && stack.last != '\"')
-					stack.push(c);
-			}
-
-			if(c == ':')
-			{
-				if(stack.last == ',')
-					printError(lineNo, line, "collon after comma");
-				else if(stack.last == '[')
-					printError(lineNo, line, "collon in array");
-				else if(stack.last != '\\' && stack.last != '\"')
-					stack.push(c);
+				if(stack.last == JsonPlace.array || stack.last == JsonPlace.field)
+				{
+					if(stack.last == JsonPlace.field)
+						stack.pop();
+					stack.push(JsonPlace.andmore);
+				}
+				else
+				{
+					stack.push(JsonPlace.invalid);
+					printError(lineNo, line, "suddenly comma");
+				}
 			}
 
 			if(c == '\"')
 			{
-				if(stack.last == '\"')
-					stack.pop();
+				if(stack.last == JsonPlace.array 
+					|| (stack.last == JsonPlace.andmore && stack.prelast == JsonPlace.array)
+					|| stack.last == JsonPlace.object
+					|| (stack.last == JsonPlace.andmore && stack.prelast == JsonPlace.object)
+					|| stack.last == JsonPlace.field
+					|| stack.last == JsonPlace.string)
+				{
+					if(stack.last == JsonPlace.string)
+						stack.pop();
+					else
+					{
+						if(stack.last == JsonPlace.andmore)
+							stack.pop();
+						if(stack.last == JsonPlace.object)
+							stack.push(JsonPlace.name);
+						stack.push(JsonPlace.string);
+					}
+				}
 				else
 				{
-					if(stack.last == ',' || stack.last == ':')
-						stack.pop();
-					stack.push(c);
+					stack.push(JsonPlace.invalid);
+					printError(lineNo, line, "suddenly quotes mark");
 				}
 			}
-			writeln(stack);
+
+			if(c == '\\')
+			{
+				if(stack.last == JsonPlace.string)
+					stack.push(JsonPlace.escape);
+				else
+				{
+					stack.push(JsonPlace.invalid);
+					printError(lineNo, line, "suddenly backslash");
+				}
+			}
+
+			if(c == ':')
+			{
+				if(stack.last == JsonPlace.name)
+				{
+					stack.pop();
+					stack.push(JsonPlace.field);
+				}
+				else
+				{
+					stack.push(JsonPlace.invalid);
+					printError(lineNo, line, "suddenly comma");
+				}
+			}
+
+			if(canFind(jsonSymbol, c))
+				writeln(stack);
 		}
 		++lineNo;
 	}
@@ -105,23 +192,23 @@ int main()
 
 struct Stack
 {
-	dchar last() @property nothrow pure @safe @nogc
+	JsonPlace last() @property nothrow pure @safe @nogc
 	{
 		if(representation.length < 1)
-			return '\0';
+			return JsonPlace.empty;
 		return representation[$ - 1];
 	}
 
-	dchar prelast() @property nothrow pure @safe @nogc
+	JsonPlace prelast() @property nothrow pure @safe @nogc
 	{
 		if(representation.length < 2)
-			return '\0';
+			return JsonPlace.empty;
 		return representation[$ - 2];
 	}
 
-	void push(dchar c)nothrow pure @safe
+	void push(JsonPlace jp)nothrow pure @safe
 	{
-		representation ~= c;
+		representation ~= jp;
 	}
 
 	void pop()nothrow pure @safe
@@ -130,13 +217,21 @@ struct Stack
 			--representation.length;
 	}
 
-	dstring toString()pure nothrow @safe
+	string toString()nothrow @safe
 	{
-		return representation.idup;
+		auto mapping = [JsonPlace.empty:"e", JsonPlace.invalid:"i",
+			JsonPlace.array:"A", JsonPlace.object:"O", 
+			JsonPlace.name:"n", JsonPlace.field:"f", JsonPlace.andmore:"m", JsonPlace.escape:"\\",
+			JsonPlace.string:"S", JsonPlace.boolean:"B",
+			JsonPlace.integer:"I", JsonPlace.floating:"F"];
+		string result;
+		foreach(jp; representation)
+			result ~= mapping[jp] ~ " ";
+		return result;
 	}
 
 private:
-	dchar[] representation;
+	JsonPlace[] representation;
 }
 
 void check(T)(T predicate, lazy JSONValue jsonValue, lazy string message)
@@ -153,4 +248,5 @@ void check(T)(T predicate, lazy JSONValue jsonValue, lazy string message)
 void printError(uint lineNo, ubyte[] line, string message)
 {
 	stderr.writeln("There is an error in ", lineNo, " line:\n", cast(char[])line,"\n",message);
+	core.stdc.stdlib.exit(1);
 }
