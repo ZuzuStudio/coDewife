@@ -93,6 +93,26 @@ int main()
 				}
 			}
 
+			//TODO dot treatment
+			if('0' <= c && c <= '9')
+			{
+				if(stack.last == JsonPlace.array 
+					|| (stack.last == JsonPlace.andmore && stack.prelast == JsonPlace.array)
+					|| stack.last == JsonPlace.field
+					|| stack.last == JsonPlace.integer
+					|| stack.last == JsonPlace.floating)
+				{
+					if(stack.last == JsonPlace.andmore)
+						stack.pop();
+					stack.push(JsonPlace.integer);
+				}
+			}
+			else
+			{
+				if(stack.last == JsonPlace.integer || stack.last == JsonPlace.floating)
+					stack.pop();
+			}
+
 			if(c == ',')
 			{
 				if(stack.last == JsonPlace.array || stack.last == JsonPlace.field)
