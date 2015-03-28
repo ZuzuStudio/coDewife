@@ -93,14 +93,24 @@ int main()
 				}
 			}
 
-			//TODO dot treatment
-			if('0' <= c && c <= '9')
+			if(('0' <= c && c <= '9') || (c == '.'))
 			{
-				if(stack.last == JsonPlace.array 
+				if(c == '.')
+				{
+					if(stack.last == JsonPlace.integer)
+					{
+						stack.pop();
+						stack.push(JsonPlace.floating);
+					}
+					else
+					{
+						stack.push(JsonPlace.invalid);
+						printError(lineNo, line, "dot not in floating");
+					}
+				}
+				else if(stack.last == JsonPlace.array 
 					|| (stack.last == JsonPlace.andmore && stack.prelast == JsonPlace.array)
-					|| stack.last == JsonPlace.field
-					|| stack.last == JsonPlace.integer
-					|| stack.last == JsonPlace.floating)
+					|| stack.last == JsonPlace.field)
 				{
 					if(stack.last == JsonPlace.andmore)
 						stack.pop();
@@ -180,8 +190,13 @@ int main()
 				}
 			}
 
+			version(none){
 			if(canFind(jsonSymbol, c))
 				writeln(stack);
+			}
+			
+			if(stack.last == JsonPlace.invalid)
+				core.stdc.stdlib.exit(1);
 		}
 		++lineNo;
 	}
