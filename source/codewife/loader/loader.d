@@ -37,17 +37,26 @@ int main()
                 switch (automat["type"].str)
                 {
                     case "singleIdentity":
+                        auto str = automat["string"].str;
+                        primordial_soup[automat["name"].str] = isForwardDirection ? makeSingleIdentity!(Direction.forward)(str) :
+                                                                                    makeSingleIdentity!(Direction.backward)(str);
                         break;
                     case "rangeIdentity":
                         auto from = automat["from"].str;
                         assert(from.length == 1);
                         auto to = automat["to"].str;
                         assert(to.length == 1);
-                        primordial_soup[automat["name"].str] = makeRangeIdentity!(direction)(from, to);
+                        primordial_soup[automat["name"].str] = isForwardDirection ? makeRangeIdentity!(Direction.forward)(from, to) :
+                                                                                    makeRangeIdentity!(Direction.backward)(from, to);
                         break;
                     case "allIdentity":
+                        primordial_soup[automat["name"].str] = isForwardDirection ? makeAllIdentity!(Direction.forward)() :
+                                                                                    makeAllIdentity!(Direction.backward)();
                         break;
-                    case "":
+                    case "general":
+                        writeln("[!] General automats don't support now");
+                    
+                        break;
                     default:
                         assert(false, "Unexpected elementar fsm. Maybe it don't support now");
                 }
