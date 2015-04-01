@@ -136,7 +136,7 @@
 		"automata":
 		[
 			"PluralXU",
-			"BacwardBinaryDigit",
+            "BackwardBinaryDigit",
 			"PluralBinaryPeriod",
 			"RestBackwardBinaryInteger"
 		]
@@ -165,7 +165,7 @@
 		]
 	},
 	{
-		"name": "BacwardBinaryDigit",
+        "name": "BackwardBinaryDigit",
 		"type": "rangeIdentity",
 		"direction": "backward",
 		"from": "0",
@@ -368,7 +368,7 @@
 		"automata":
 		[
 			"PluralXU",
-			"BacwardDecimalDigit",
+            "BackwardDecimalDigit",
 			"PluralDecimalPeriod",
 			"RestBackwardDecimalInteger"
 		]
@@ -474,5 +474,79 @@
 		[
 			"UU*D"
 		]
-	}
+    },
+    {
+        "name": "IntegerSuffix",
+        "type": "parallel",
+        "automata":
+        [
+            "Lu",
+            "LU",
+            "uL",
+            "UL",
+            "L",
+            "u",
+            "U"
+        ]
+    },
+    {
+        "name": "Lu",
+        "type": "sequence",
+        "automata":
+        [
+            "L",
+            "u"
+        ]
+    },
+    {
+        "name": "L",
+        "type": "singleIdentity",
+        "string": "L"
+    },
+    {
+        "name": "u",
+        "type": "singleIdentity",
+        "string": "u"
+    },
+    {
+        "name": "LU",
+        "type": "sequence",
+        "automata":
+        [
+            "L",
+            "U"
+        ]
+    },
+    {
+        "name": "U",
+        "type": "singleIdentity",
+        "string": "U"
+    },
+    {
+        "name": "uL",
+        "type": "sequence",
+        "automata":
+        [
+            "u",
+            "L"
+        ]
+    },
+    {
+        "name": "UL",
+        "type": "sequence",
+        "automata":
+        [
+            "U",
+            "L"
+        ]
+    },
+    {
+        "name": "NonEof",
+        "type": "general",
+        "predicate": true,
+        "mapping":
+        [
+            "identity"
+        ]
+    }
 ]
