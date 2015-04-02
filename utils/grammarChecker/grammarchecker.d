@@ -70,6 +70,14 @@ int main()
 	foreach(pair; verteces.byKeyValue)
 		writeln(pair.key, ": ", pair.value[0], " ", pair.value[1]);
 
+	bool cohernce = true;
+
+	foreach(automat; verteces.byValue)
+		cohernce = cohernce && automat[1];
+
+	if(!cohernce)
+		stderr.writeln("System of automata isn't coherent");
+
 	return 0;
 }
 
