@@ -48,6 +48,7 @@ int main()
 			check(("automata" in automat), automat, "No automata for configuration defined");
 			check(automat["automata"].type == JSON_TYPE.ARRAY, automat, "Field automata isn't array");
 			string[] automataString;
+			check(automat["automata"].array.length > 0, automat,  "Field automata is empty");
 			foreach(subautomat; automat["automata"].array)
 			{
 				writeln("\t", subautomat.str);
