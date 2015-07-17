@@ -30,7 +30,7 @@ void main()
 	terms.output();
 	writeln("\n============================================");
 	writeln("============= Logical Underscore ============");
-	bytifyUnderscore();
+	beautifyUnderscore();
 	terms.output();
 	writeln("\n============================================");
 }

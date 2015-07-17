@@ -135,7 +135,7 @@ unittest
 	keepAllUserUnderscore();
 	assert(sequence.charSequence == "_:_::_");
 
-	bytifyUnderscore();
+	beautifyUnderscore();
 	assert(sequence.charSequence == "::_:_");
 }
 
@@ -172,7 +172,7 @@ void keepAllUserUnderscore()
 	TermBistate!("CU").activated = true;
 }
 
-void bytifyUnderscore()
+void beautifyUnderscore()
 {
 	TermBistate!("UU").activated = false;
 	TermBistate!("XU").activated = false;

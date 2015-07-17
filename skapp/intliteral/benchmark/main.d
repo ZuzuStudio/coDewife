@@ -22,7 +22,7 @@ void main()
 	
 	OutputTerm[] terms;
 	size_t position = 0;
-	bytifyUnderscore();
+	beautifyUnderscore();
 	
 	StopWatch sw;
 	
